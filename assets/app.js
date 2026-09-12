@@ -21,20 +21,11 @@ const toFaDigits = (n) => String(n).replace(/[0-9]/g, (d) => FA_DIGITS[d]);
 // شماره‌ی روز هفته با آغاز از شنبه (۰) تا جمعه (۶)، بر پایه‌ی Date.getDay() جاوااسکریپت
 const weekdayIndex = (jsDate) => (jsDate.getDay() + 1) % 7;
 
-let EVENTS = {};
-let dataLoaded = false;
-
-async function loadEvents() {
-  try {
-    const res = await fetch("data/events.json");
-    EVENTS = await res.json();
-  } catch (err) {
-    console.warn("بارگذاری داده‌ی رخدادها ناموفق بود:", err);
-    EVENTS = {};
-  } finally {
-    dataLoaded = true;
-  }
-}
+// داده‌ها از پیش، با تگ‌های <script> عادی در index.html، در window قرار گرفته‌اند
+// (assets/events-data.js و assets/history-facts.js) — نیازی به fetch و انتظار نیست،
+// برای همین نمایش بدون هیچ حالت «در حال بارگذاری» بلافاصله انجام می‌شود.
+const EVENTS = window.SARE_EVENTS || {};
+const HISTORY_FACTS = window.SARE_HISTORY_FACTS || [];
 
 function pad2(n) { return String(n).padStart(2, "0"); }
 
@@ -162,15 +153,56 @@ function shiftMonth(jy, jm, delta) {
   return { y, m };
 }
 
-async function main() {
-  await loadEvents();
-  const today = todayJalali();
-  let { jy, jm } = today;
+// ساعت رسمی ایران: منطقه‌ی زمانی «Asia/Tehran»، همان مبنایی که time.ir از آن استفاده
+// می‌کند (از سال ۱۴۰۱ ایران دیگر ساعت تابستانی/زمستانی ندارد و آفست همیشه +۳:۳۰ است).
+// چون هیچ سروری در کار نیست، ساعت از ساعتِ خودِ دستگاه کاربر محاسبه می‌شود، نه از یک
+// اتصال زنده به time.ir؛ اگر ساعت دستگاه درست تنظیم باشد، دقیقاً با آن یکسان خواهد بود.
+const TEHRAN_TIME_FMT = new Intl.DateTimeFormat("fa-IR-u-nu-latn", {
+  timeZone: "Asia/Tehran",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
 
-  document.getElementById("today-pill").textContent =
-    "امروز: " + new Date().toISOString().slice(0, 10) + " (میلادی)";
+function updateClock() {
+  const parts = TEHRAN_TIME_FMT.formatToParts(new Date());
+  const get = (t) => parts.find((p) => p.type === t)?.value ?? "00";
+  const label = `${toFaDigits(get("hour"))}:${toFaDigits(get("minute"))}:${toFaDigits(get("second"))}`;
+  const el = document.getElementById("clock-pill");
+  if (el) el.textContent = "ساعت ایران " + label;
+}
+
+function updateTodayPill() {
+  const el = document.getElementById("today-pill");
+  if (!el) return;
+  const g = new Date();
+  el.textContent = "امروز: " + `${g.getFullYear()}-${pad2(g.getMonth() + 1)}-${pad2(g.getDate())}` + " (میلادی)";
+}
+
+// یک عدد پایدار برای هر روزِ تقویم (نه هر بارگذاری صفحه) تا انتخاب جمله‌ی روز ثابت بماند
+function stableDayNumber(jy, jm, jd) {
+  return jy * 372 + jm * 31 + jd; // شماره‌ای یکتا و پیوسته برای هر روز جلالی
+}
+
+function renderFactOfTheDay() {
+  if (!HISTORY_FACTS.length) return;
+  const t = todayJalali();
+  const idx = stableDayNumber(t.jy, t.jm, t.jd) % HISTORY_FACTS.length;
+  const el = document.getElementById("fact-text");
+  if (el) el.textContent = HISTORY_FACTS[idx];
+}
+
+function main() {
+  const today = todayJalali();
+  const { jy, jm } = today;
+
+  updateTodayPill();
+  updateClock();
+  setInterval(updateClock, 1000);
 
   render(jy, jm);
+  renderFactOfTheDay();
 
   document.getElementById("prev-btn").addEventListener("click", () => {
     const cur = document.querySelector("main");

@@ -84,6 +84,13 @@ body {
 .topbar h1 { font-size: 1.5rem; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
 .brand-en { font-size: 0.72rem; color: #8a8375; letter-spacing: 1px; }
 
+.today-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .today-pill {
   font-size: 0.85rem;
   color: var(--teal-deep);
@@ -91,7 +98,37 @@ body {
   border: 1px solid var(--line);
   padding: 6px 14px;
   border-radius: 999px;
+  white-space: nowrap;
 }
+
+.clock-pill {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: var(--teal-deep);
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  min-width: 9.5em;
+  text-align: center;
+}
+
+.fact-card {
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-inline-start: 4px solid var(--gold);
+  border-radius: var(--radius);
+}
+.fact-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.fact-text { margin: 0; font-size: 0.9rem; line-height: 1.8; color: var(--ink); }
 
 .month-nav {
   display: flex;
@@ -161,7 +198,32 @@ body {
 .holiday-dot { background: var(--terracotta); }
 
 @media (max-width: 640px) {
-  .cell { min-height: 74px; }
+  .frame { padding: 16px 10px 40px; }
+
+  .topbar { justify-content: center; text-align: center; }
+  .brand { flex-direction: column; gap: 4px; }
+  .brand-text { align-items: center; }
+  .today-box { justify-content: center; width: 100%; }
+  .today-pill, .clock-pill { font-size: 0.78rem; padding: 5px 10px; }
+  .clock-pill { min-width: 8em; }
+
+  .month-nav { gap: 6px; }
+  .nav-btn { font-size: 0.78rem; padding: 6px 8px; }
+  .month-name { font-size: 1.2rem; margin-inline-end: 6px; }
+  .year-name { font-size: 1rem; }
+
+  .head-cell { font-size: 0.68rem; padding: 6px 2px; }
+  .cell { min-height: 68px; padding: 5px 4px 4px; }
+  .day-num { font-size: 0.9rem; }
   .day-greg { display: none; }
-  .month-name { font-size: 1.3rem; }
+  .event-list { font-size: 0.6rem; }
+
+  .fact-card { padding: 10px 12px; font-size: 0.85rem; }
+  .fact-text { font-size: 0.82rem; line-height: 1.7; }
+}
+
+@media (max-width: 380px) {
+  .cell { min-height: 58px; }
+  .event-list li:nth-child(n+2) { display: none; }
+  .event-list .more { display: none; }
 }
