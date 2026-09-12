@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Geek Neuron
+Copyright (c) 2026 Sare Calendar contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+NOTE: this license covers this project's own code only. Bundled third-party
+assets keep their original licenses — see:
+  - assets/fonts/VAZIRMATN-LICENSE-OFL.txt   (Vazirmatn font, SIL OFL 1.1)
+  - assets/vendor/LICENSE-jalaali-js.txt     (jalaali-js, MIT)
+The event/holiday data in data/events.json was generated with the `rokh`
+Python package (github.com/openscilab/rokh).

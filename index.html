@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقویم سره | Sare Calendar</title>
+<meta name="description" content="تقویم سرهٔ جلالی — رخدادها، مناسبت‌ها و تعطیلی‌های رسمی ایران، همراه با تاریخ میلادی">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="frame">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1>تقویم سره</h1>
+        <span class="brand-en">Sare Calendar</span>
+      </div>
+    </div>
+    <div class="today-pill" id="today-pill">در حال بارگذاری…</div>
+  </header>
+
+  <nav class="month-nav">
+    <button class="nav-btn" id="prev-btn" aria-label="ماه پیشین">‹ ماه پیشین</button>
+    <div class="month-title">
+      <span class="month-name" id="month-name">—</span>
+      <span class="year-name" id="year-name">—</span>
+    </div>
+    <button class="nav-btn" id="next-btn" aria-label="ماه پسین">ماه پسین ›</button>
+  </nav>
+
+  <div class="today-row">
+    <button class="today-btn" id="today-btn">برو به امروز</button>
+  </div>
+
+  <main class="grid" id="grid" data-jy="" data-jm="">
+    <!-- با جاوااسکریپت پر می‌شود -->
+  </main>
+
+  <footer class="foot-note">
+    <p>روزهای <span class="dot holiday-dot"></span> تعطیل رسمی‌اند. تاریخ خاکستری زیر هر روز، هم‌ارز میلادیِ آن است.</p>
+    <p class="tiny">
+      همه‌چیز در همین مرورگر اجرا می‌شود، بدون سرور. تبدیل گاهشماری با
+      <a href="https://github.com/jalaali/jalaali-js" target="_blank" rel="noopener">jalaali-js</a> (مجوز MIT)
+      و داده‌ی رخدادها برگرفته از بستهٔ آزاد
+      <a href="https://github.com/openscilab/rokh" target="_blank" rel="noopener">rokh</a>.
+      فونت: <a href="https://github.com/rastikerdar/vazirmatn" target="_blank" rel="noopener">وزیرمتن</a> (مجوز OFL).
+    </p>
+  </footer>
+</div>
+
+<script type="module" src="assets/app.js"></script>
+</body>
+</html>
