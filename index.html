@@ -18,7 +18,10 @@
         <span class="brand-en">Sare Calendar</span>
       </div>
     </div>
-    <div class="today-pill" id="today-pill">در حال بارگذاری…</div>
+    <div class="today-box">
+      <span class="today-pill" id="today-pill"></span>
+      <span class="clock-pill" id="clock-pill" title="ساعت رسمی ایران (تهران، UTC+۳:۳۰)"></span>
+    </div>
   </header>
 
   <nav class="month-nav">
@@ -38,18 +41,26 @@
     <!-- با جاوااسکریپت پر می‌شود -->
   </main>
 
+  <div class="fact-card" id="fact-card">
+    <span class="fact-label">جمله‌ی امروز</span>
+    <p class="fact-text" id="fact-text"></p>
+  </div>
+
   <footer class="foot-note">
-    <p>روزهای <span class="dot holiday-dot"></span> تعطیل رسمی‌اند. تاریخ خاکستری زیر هر روز، هم‌ارز میلادیِ آن است.</p>
+    <p>روزهای <span class="dot holiday-dot"></span> تعطیل رسمی‌اند (شامل مناسبت‌های مذهبیِ تعطیل، بدون نمایش متن‌شان). تاریخ خاکستری زیر هر روز، هم‌ارز میلادیِ آن است.</p>
     <p class="tiny">
       همه‌چیز در همین مرورگر اجرا می‌شود، بدون سرور. تبدیل گاهشماری با
       <a href="https://github.com/jalaali/jalaali-js" target="_blank" rel="noopener">jalaali-js</a> (مجوز MIT)
       و داده‌ی رخدادها برگرفته از بستهٔ آزاد
       <a href="https://github.com/openscilab/rokh" target="_blank" rel="noopener">rokh</a>.
       فونت: <a href="https://github.com/rastikerdar/vazirmatn" target="_blank" rel="noopener">وزیرمتن</a> (مجوز OFL).
+      ساعت، بر پایه‌ی منطقه‌ی زمانی رسمی ایران (همان مبنایی که time.ir از آن استفاده می‌کند) محاسبه می‌شود.
     </p>
   </footer>
 </div>
 
+<script src="assets/events-data.js"></script>
+<script src="assets/history-facts.js"></script>
 <script type="module" src="assets/app.js"></script>
 </body>
 </html>
