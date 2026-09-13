@@ -4,14 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تقویم سره | Sare Calendar</title>
-<meta name="description" content="تقویم سرهٔ جلالی — رخدادها، مناسبت‌ها و تعطیلی‌های رسمی ایران، همراه با تاریخ میلادی">
+<meta name="description" content="تقویم سرهٔ جلالی — رخدادها و فرویش‌های ایران، همراه با روزشمار ترسایی">
+<meta name="theme-color" content="#16575A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="stylesheet" href="assets/style.css">
+<script>
+if (localStorage.getItem("sareTheme") === "dark") document.documentElement.classList.add("dark");
+</script>
 </head>
 <body>
 
 <div class="frame">
   <header class="topbar">
     <div class="brand">
+      <button class="tools-btn" id="tools-btn" aria-label="ابزارها">☰</button>
       <span class="brand-mark" aria-hidden="true"></span>
       <div class="brand-text">
         <h1>تقویم سره</h1>
@@ -19,8 +27,9 @@
       </div>
     </div>
     <div class="today-box">
+      <button class="theme-toggle" id="theme-toggle" aria-label="تغییر پوسته">◐</button>
       <span class="today-pill" id="today-pill"></span>
-      <span class="clock-pill" id="clock-pill" title="ساعت رسمی ایران (تهران، UTC+۳:۳۰)"></span>
+      <span class="clock-pill" id="clock-pill"></span>
     </div>
   </header>
 
@@ -37,9 +46,9 @@
     <button class="today-btn" id="today-btn">برو به امروز</button>
   </div>
 
-  <main class="grid" id="grid" data-jy="" data-jm="">
-    <!-- با جاوااسکریپت پر می‌شود -->
-  </main>
+  <main class="grid" id="grid" data-jy="" data-jm=""></main>
+
+  <div class="day-detail" id="day-detail"></div>
 
   <div class="fact-card" id="fact-card">
     <span class="fact-label">جمله‌ی امروز</span>
@@ -47,20 +56,33 @@
   </div>
 
   <footer class="foot-note">
-    <p>روزهای <span class="dot holiday-dot"></span> تعطیل رسمی‌اند (شامل مناسبت‌های مذهبیِ تعطیل، بدون نمایش متن‌شان). تاریخ خاکستری زیر هر روز، هم‌ارز میلادیِ آن است.</p>
-    <p class="tiny">
-      همه‌چیز در همین مرورگر اجرا می‌شود، بدون سرور. تبدیل گاهشماری با
-      <a href="https://github.com/jalaali/jalaali-js" target="_blank" rel="noopener">jalaali-js</a> (مجوز MIT)
-      و داده‌ی رخدادها برگرفته از بستهٔ آزاد
-      <a href="https://github.com/openscilab/rokh" target="_blank" rel="noopener">rokh</a>.
-      فونت: <a href="https://github.com/rastikerdar/vazirmatn" target="_blank" rel="noopener">وزیرمتن</a> (مجوز OFL).
-      ساعت، بر پایه‌ی منطقه‌ی زمانی رسمی ایران (همان مبنایی که time.ir از آن استفاده می‌کند) محاسبه می‌شود.
-    </p>
+    <p>روزهای <span class="dot holiday-dot"></span> فرویش‌اند.</p>
+    <p class="tiny">واژه‌یاب سره با بهره از پایگاه‌داده‌ی «پاسبان» (<a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">Pasban</a>)</p>
   </footer>
+</div>
+
+<div class="menu-overlay" id="menu-overlay"></div>
+<aside class="side-menu" id="side-menu">
+  <div class="side-menu-header">
+    <h2>ابزارها</h2>
+    <button class="side-menu-close" id="menu-close" aria-label="بستن">×</button>
+  </div>
+  <div class="tool-list" id="tool-list"></div>
+</aside>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <button class="modal-close" id="modal-close" aria-label="بستن">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
 </div>
 
 <script src="assets/events-data.js"></script>
 <script src="assets/history-facts.js"></script>
+<script src="assets/pasban-words.js"></script>
 <script type="module" src="assets/app.js"></script>
 </body>
 </html>
