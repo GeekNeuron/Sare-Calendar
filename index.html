@@ -58,6 +58,11 @@ if (localStorage.getItem("sareTheme") === "dark") document.documentElement.class
     <p class="fact-text" id="fact-text"></p>
   </div>
 
+  <div class="fact-card proverb-card" id="proverb-card">
+    <span class="fact-label">مثل روز</span>
+    <p class="fact-text" id="proverb-text"></p>
+  </div>
+
   <footer class="foot-note">
     <p>روزهای <span class="dot holiday-dot"></span> فرویش‌اند.</p>
     <p class="tiny">واژه‌یاب سره با بهره از پایگاه‌داده‌ی «پاسبان» (<a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">Pasban</a>)</p>
@@ -84,7 +89,10 @@ if (localStorage.getItem("sareTheme") === "dark") document.documentElement.class
 </div>
 
 <script src="assets/events-data.js"></script>
+<script src="assets/events-regional.js"></script>
+<script src="assets/event-context.js"></script>
 <script src="assets/history-facts.js"></script>
+<script src="assets/proverbs.js"></script>
 <script src="assets/pasban-words.js"></script>
 <script type="module" src="assets/app.js"></script>
 </body>
