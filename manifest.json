@@ -1,7 +1,7 @@
 {
-  "name": "تقویم سره | Sare Calendar",
-  "short_name": "تقویم سره",
-  "description": "تقویم سرهٔ جلالی همراه با رخدادها، ابزارها و جمله‌ی روز",
+  "name": "گاهشمار سره | Sare Calendar",
+  "short_name": "گاهشمار سره",
+  "description": "گاهشمار سرهٔ جلالی همراه با رخدادها، ابزارها و جمله‌ی روز",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
