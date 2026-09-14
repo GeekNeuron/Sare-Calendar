@@ -49,14 +49,24 @@ const toFaDigits = (n) => String(n).replace(/[0-9]/g, (d) => FA_DIGITS[d]);
 const weekdayIndex = (jsDate) => (jsDate.getDay() + 1) % 7;
 
 const EVENTS = window.SARE_EVENTS || {};
+const EVENTS_REGIONAL = window.SARE_EVENTS_REGIONAL || {};
 const HISTORY_FACTS = window.SARE_HISTORY_FACTS || [];
+const PROVERBS = window.SARE_PROVERBS || [];
+const EVENT_CONTEXT = window.SARE_EVENT_CONTEXT || {};
 const PASBAN_WORDS = window.SARE_PASBAN_WORDS || {};
+
+const REGIONAL_KEY = "sareRegionalEvents";
+const regionalEnabled = () => localStorage.getItem(REGIONAL_KEY) === "on";
 
 function pad2(n) { return String(n).padStart(2, "0"); }
 
 function dayInfo(jy, jm, jd) {
   const key = `${jy}-${pad2(jm)}-${pad2(jd)}`;
-  return EVENTS[key] || { events: [], is_holiday: false };
+  const base = EVENTS[key] || { events: [], is_holiday: false };
+  if (regionalEnabled() && EVENTS_REGIONAL[key]) {
+    return { events: [...base.events, ...EVENTS_REGIONAL[key]], is_holiday: base.is_holiday };
+  }
+  return base;
 }
 
 function jashnFor(jm, jd) {
@@ -242,7 +252,13 @@ function renderDayDetail(jy, jm, jd) {
   const note = notes[noteKey];
 
   const eventsHtml = events.length
-    ? `<ul class="detail-event-list">${events.map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul>`
+    ? `<ul class="detail-event-list">${events.map((e) => {
+        const ctx = EVENT_CONTEXT[e];
+        if (ctx) {
+          return `<li class="expandable"><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span><span class="ev-arrow">›</span></span><p class="ev-context">${escapeHtml(ctx)}</p></li>`;
+        }
+        return `<li><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span></span></li>`;
+      }).join("")}</ul>`
     : `<p class="detail-empty">رخدادی برای این روز ثبت نشده.</p>`;
   const noteHtml = note ? `<p class="detail-note"><b>یادداشت شما:</b> ${escapeHtml(note)}</p>` : "";
 
@@ -255,6 +271,9 @@ function renderDayDetail(jy, jm, jd) {
     </div>
     ${eventsHtml}
     ${noteHtml}`;
+  holder.querySelectorAll(".detail-event-list li.expandable").forEach((li) => {
+    li.addEventListener("click", () => li.classList.toggle("open"));
+  });
   void holder.offsetWidth;
   holder.classList.add("refresh");
 }
@@ -328,11 +347,30 @@ function stableDayNumber(jy, jm, jd) {
 }
 
 function renderFactOfTheDay() {
-  if (!HISTORY_FACTS.length) return;
-  const t = todayJalali();
-  const idx = stableDayNumber(t.jy, t.jm, t.jd) % HISTORY_FACTS.length;
   const el = document.getElementById("fact-text");
-  if (el) el.textContent = HISTORY_FACTS[idx];
+  if (!el) return;
+  const t = todayJalali();
+  const info = dayInfo(t.jy, t.jm, t.jd);
+  const jashn = jashnFor(t.jm, t.jd);
+  const todaysEvents = jashn ? [jashn, ...(info.events || [])] : (info.events || []);
+  if (todaysEvents.length) {
+    const idx = stableDayNumber(t.jy, t.jm, t.jd) % todaysEvents.length;
+    const chosen = todaysEvents[idx];
+    const ctx = EVENT_CONTEXT[chosen];
+    el.textContent = ctx ? `${chosen} ${ctx}` : chosen;
+    return;
+  }
+  if (!HISTORY_FACTS.length) return;
+  const idx = stableDayNumber(t.jy, t.jm, t.jd) % HISTORY_FACTS.length;
+  el.textContent = HISTORY_FACTS[idx];
+}
+
+function renderProverbOfTheDay() {
+  if (!PROVERBS.length) return;
+  const t = todayJalali();
+  const idx = (stableDayNumber(t.jy, t.jm, t.jd) + 7) % PROVERBS.length;
+  const el = document.getElementById("proverb-text");
+  if (el) el.textContent = PROVERBS[idx];
 }
 
 function openSideMenu() {
@@ -768,6 +806,92 @@ function toolWordFinder() {
   document.getElementById("word-input").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
 }
 
+function searchEvents(query) {
+  const q = query.trim();
+  if (!q) return [];
+  const year = todayJalali().jy;
+  const results = [];
+  for (let jm = 1; jm <= 12; jm += 1) {
+    const days = jalaaliMonthLength(year, jm);
+    for (let jd = 1; jd <= days; jd += 1) {
+      const jashn = jashnFor(jm, jd);
+      const info = dayInfo(year, jm, jd);
+      const events = jashn ? [jashn, ...(info.events || [])] : (info.events || []);
+      events.forEach((e) => {
+        if (e.includes(q)) results.push({ jm, jd, text: e });
+      });
+    }
+  }
+  return results;
+}
+
+function toolEventSearch() {
+  const html = `
+    <div class="tool-section">
+      <div class="field-row">
+        <label>نام یا رخداد را بجویید</label>
+        <input type="text" id="search-input" placeholder="برای نمونه: کوروش">
+      </div>
+      <button class="tool-btn" id="search-run">بجوی</button>
+      <div id="search-results"></div>
+    </div>`;
+  openModal("جست‌وجوی رخداد", html);
+
+  const run = () => {
+    const q = document.getElementById("search-input").value;
+    const holder = document.getElementById("search-results");
+    if (!q.trim()) { holder.innerHTML = ""; return; }
+    const results = searchEvents(q);
+    if (!results.length) {
+      holder.innerHTML = `<p class="tool-note">چیزی یافت نشد.</p>`;
+      return;
+    }
+    holder.innerHTML = `<ul class="search-result-list">${results.map((r) =>
+      `<li class="search-result-item" data-m="${r.jm}" data-d="${r.jd}">
+        <span class="sr-date">${toFaDigits(r.jd)} ${MONTHS_FA[r.jm - 1]}</span>
+        <span class="sr-text">${escapeHtml(r.text)}</span>
+      </li>`
+    ).join("")}</ul>`;
+    holder.querySelectorAll(".search-result-item").forEach((li) => {
+      li.addEventListener("click", () => {
+        const jm = Number(li.dataset.m);
+        const jd = Number(li.dataset.d);
+        const t = todayJalali();
+        closeModal();
+        render(t.jy, jm);
+        selectDay(t.jy, jm, jd);
+      });
+    });
+  };
+  document.getElementById("search-run").addEventListener("click", run);
+  document.getElementById("search-input").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
+}
+
+function toolSettings() {
+  const on = regionalEnabled();
+  const html = `
+    <div class="tool-section">
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">رخدادهای منطقه‌ای</div>
+          <div class="tool-note" style="margin-top:2px">روزهای شیراز، اصفهان، کرمان و چند شهر دیگر را هم به تقویم اضافه کن.</div>
+        </div>
+        <button class="toggle-switch ${on ? "on" : ""}" id="regional-toggle" role="switch" aria-checked="${on}"><span class="toggle-knob"></span></button>
+      </div>
+    </div>`;
+  openModal("تنظیمات", html);
+
+  document.getElementById("regional-toggle").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const next = !btn.classList.contains("on");
+    btn.classList.toggle("on", next);
+    btn.setAttribute("aria-checked", String(next));
+    localStorage.setItem(REGIONAL_KEY, next ? "on" : "off");
+    const cur = document.querySelector("main");
+    render(Number(cur.dataset.jy), Number(cur.dataset.jm));
+  });
+}
+
 const TOOLS = {
   "date-converter": { label: "ترادیسیِ روزشمار", run: toolDateConverter },
   "date-diff": { label: "فاصله‌ی دو روزشمار و دیره", run: toolDateDiff },
@@ -776,7 +900,9 @@ const TOOLS = {
   "notes": { label: "یادداشت‌ها", run: toolNotes },
   "year-view": { label: "نمای سال", run: toolYearView },
   "share-today": { label: "هم‌رسانیِ امروز", run: toolShareToday },
+  "event-search": { label: "جست‌وجوی رخداد", run: toolEventSearch },
   "word-finder": { label: "واژه‌یاب سره", run: toolWordFinder },
+  "settings": { label: "تنظیمات", run: toolSettings },
 };
 
 function buildSideMenu() {
@@ -823,6 +949,7 @@ function main() {
 
   render(jy, jm);
   renderFactOfTheDay();
+  renderProverbOfTheDay();
   buildSideMenu();
   registerServiceWorker();
 

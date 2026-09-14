@@ -285,8 +285,7 @@ html.dark .theme-toggle .moon { opacity: 1; transform: translate(-50%, -50%) rot
   margin-top: 16px;
   padding: 14px 18px;
   background: var(--card);
-  border: 1px solid var(--line);
-  border-inline-start: 4px solid var(--teal);
+  border: 1.5px dashed var(--teal);
   border-radius: var(--radius);
   transition: background 0.35s ease, border-color 0.35s ease;
 }
@@ -306,6 +305,16 @@ html.dark .theme-toggle .moon { opacity: 1; transform: translate(-50%, -50%) rot
   content: ""; position: absolute; inline-size: 5px; block-size: 5px;
   border-radius: 50%; background: var(--teal); inset-inline-start: 0; top: 9px;
 }
+.detail-event-list li.expandable { cursor: pointer; }
+.ev-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.ev-arrow { color: var(--muted); transition: transform 0.25s ease; font-size: 0.9em; flex: none; }
+.expandable.open .ev-arrow { transform: rotate(90deg); }
+.ev-context {
+  margin: 4px 0 0; padding-inline-start: 4px; font-size: 0.78rem; color: var(--muted); line-height: 1.6;
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+.expandable.open .ev-context { max-height: 100px; opacity: 1; }
 .detail-empty { margin: 0; font-size: 0.85rem; color: var(--muted); }
 .detail-note { margin: 8px 0 0; font-size: 0.85rem; background: var(--ivory); padding: 8px 10px; border-radius: 8px; transition: background 0.35s ease; }
 
@@ -313,14 +322,42 @@ html.dark .theme-toggle .moon { opacity: 1; transform: translate(-50%, -50%) rot
   margin-top: 18px;
   padding: 14px 18px;
   background: var(--card);
-  border: 1px solid var(--line);
-  border-inline-start: 4px solid var(--gold);
+  border: 1.5px dashed var(--gold);
   border-radius: var(--radius);
   animation: fadeInUp 0.35s ease;
   transition: background 0.35s ease, border-color 0.35s ease;
 }
+.proverb-card { border-color: var(--terracotta); margin-top: 14px; }
+.proverb-card .fact-label { color: var(--terracotta); }
 .fact-label { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
 .fact-text { margin: 0; font-size: 0.9rem; line-height: 1.8; color: var(--ink); }
+
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.toggle-label { font-weight: 600; font-size: 0.9rem; }
+.toggle-switch {
+  width: 44px; height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: var(--line);
+  position: relative;
+  cursor: pointer;
+  flex: none;
+  padding: 0;
+  transition: background 0.25s ease;
+}
+.toggle-switch .toggle-knob {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.toggle-switch.on { background: var(--teal); }
+.toggle-switch.on .toggle-knob { transform: translateX(-20px); }
+[dir="ltr"] .toggle-switch.on .toggle-knob { transform: translateX(20px); }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
@@ -592,6 +629,24 @@ html.dark .menu-overlay, html.dark .modal-overlay { background: rgba(0, 0, 0, 0.
   transition: transform 0.15s ease;
 }
 .note-del:hover { transform: scale(1.2); }
+
+.search-result-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--ivory);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  animation: fadeInUp 0.2s ease backwards;
+}
+.search-result-item:hover { background: var(--line); }
+.search-result-item:active { transform: scale(0.98); }
+.sr-date { color: var(--teal-deep); font-weight: 700; white-space: nowrap; font-size: 0.78rem; }
+.sr-text { flex: 1; }
 
 .year-grid {
   margin-top: 14px;
