@@ -75,6 +75,19 @@ function gregorianToJDN(y, m, d) {
   return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
 }
 
+function jdnToGregorian(jdn) {
+  const a = jdn + 32044;
+  const b = Math.floor((4 * a + 3) / 146097);
+  const c = a - Math.floor((146097 * b) / 4);
+  const d2 = Math.floor((4 * c + 3) / 1461);
+  const e = c - Math.floor((1461 * d2) / 4);
+  const m2 = Math.floor((5 * e + 2) / 153);
+  const day = e - Math.floor((153 * m2 + 2) / 5) + 1;
+  const month = m2 + 3 - 12 * Math.floor(m2 / 10);
+  const year = 100 * b + d2 - 4800 + Math.floor(m2 / 10);
+  return { gy: year, gm: month, gd: day };
+}
+
 function jdnToHijri(jdn) {
   let l = jdn - 1948440 + 10632;
   const n = Math.floor((l - 1) / 10631);
@@ -85,6 +98,10 @@ function jdnToHijri(jdn) {
   const day = l - Math.floor((709 * month) / 24);
   const year = 30 * n + j - 30;
   return { hy: year, hm: month, hd: day };
+}
+
+function hijriToJDN(hy, hm, hd) {
+  return Math.floor((11 * hy + 3) / 30) + 354 * hy + 30 * hm - Math.floor((hm - 1) / 2) + hd + 1948440 - 385;
 }
 
 function todayJalali() {
@@ -196,7 +213,7 @@ function renderGrid(weeks) {
       if (cell.isHoliday) classes.push("holiday");
       const noteDot = cell.hasNote ? `<span class="note-dot" title="یادداشت دارد"></span>` : "";
       const dot = cell.events.length ? `<span class="event-dot" title="رخداد دارد"></span>` : "";
-      return `<div class="${classes.join(" ")}" data-day="${cell.day}" tabindex="0" role="button">
+      return `<div class="${classes.join(" ")}" data-day="${cell.day}" tabindex="0" role="button" aria-label="${cell.dayFa} ${cell.dayNameFa}${cell.isHoliday ? "، فرویش" : ""}">
         <div class="cell-top">
           <span class="day-num">${cell.dayFa}</span>
           <span class="day-greg">${cell.gregorianLabel}</span>
@@ -214,6 +231,8 @@ function renderGrid(weeks) {
 
 function renderDayDetail(jy, jm, jd) {
   const g = toGregorian(jy, jm, jd);
+  const jdn = gregorianToJDN(g.gy, g.gm, g.gd);
+  const h = jdnToHijri(jdn);
   const info = dayInfo(jy, jm, jd);
   const jashn = jashnFor(jm, jd);
   const events = jashn ? [jashn, ...(info.events || [])] : (info.events || []);
@@ -228,13 +247,16 @@ function renderDayDetail(jy, jm, jd) {
   const noteHtml = note ? `<p class="detail-note"><b>یادداشت شما:</b> ${escapeHtml(note)}</p>` : "";
 
   const holder = document.getElementById("day-detail");
+  holder.classList.remove("refresh");
   holder.innerHTML = `
     <div class="detail-header">
       <span class="detail-date">${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</span>
-      <span class="detail-sub">${dayName} — ${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]} ${g.gy}${info.is_holiday ? " · فرویش" : ""}</span>
+      <span class="detail-sub">${dayName} · ${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]} ${g.gy} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · فرویش" : ""}</span>
     </div>
     ${eventsHtml}
     ${noteHtml}`;
+  void holder.offsetWidth;
+  holder.classList.add("refresh");
 }
 
 let selectedDay = null;
@@ -268,7 +290,10 @@ function render(jy, jm) {
   });
 
   const today = todayJalali();
-  let defaultDay = (today.jy === jy && today.jm === jm) ? today.jd : 1;
+  const isCurrentMonth = today.jy === jy && today.jm === jm;
+  document.getElementById("today-row").classList.toggle("show", !isCurrentMonth);
+
+  let defaultDay = isCurrentMonth ? today.jd : 1;
   if (selectedDay && selectedDay.jy === jy && selectedDay.jm === jm) {
     defaultDay = selectedDay.jd;
   }
@@ -298,13 +323,6 @@ function updateClock() {
   if (el) el.textContent = "ساعت ایران " + label;
 }
 
-function updateTodayPill() {
-  const el = document.getElementById("today-pill");
-  if (!el) return;
-  const g = new Date();
-  el.textContent = "امروز: " + `${g.getFullYear()}-${pad2(g.getMonth() + 1)}-${pad2(g.getDate())}` + " (ترسایی)";
-}
-
 function stableDayNumber(jy, jm, jd) {
   return jy * 372 + jm * 31 + jd;
 }
@@ -329,75 +347,161 @@ function closeSideMenu() {
 
 function openModal(title, bodyHtml) {
   document.getElementById("modal-title").textContent = title;
-  document.getElementById("modal-body").innerHTML = bodyHtml;
+  const body = document.getElementById("modal-body");
+  body.innerHTML = bodyHtml;
   document.getElementById("modal-overlay").classList.add("visible");
+  wireSteppers(body);
 }
 
 function closeModal() {
   document.getElementById("modal-overlay").classList.remove("visible");
 }
 
-function jalaliInputRow(idPrefix, label, defaults) {
+function wireSteppers(root) {
+  root.querySelectorAll(".step-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = document.getElementById(btn.dataset.target);
+      const step = parseInt(btn.dataset.step, 10);
+      const cur = parseInt(input.value, 10) || 0;
+      let next = cur + step;
+      if (input.min !== "" && next < parseInt(input.min, 10)) next = parseInt(input.min, 10);
+      if (input.max !== "" && next > parseInt(input.max, 10)) next = parseInt(input.max, 10);
+      input.value = next;
+    });
+  });
+}
+
+function dateFieldRow(idPrefix, label, defaults, monthNames) {
+  const opts = monthNames.map((m, i) =>
+    `<option value="${i + 1}" ${defaults.m === i + 1 ? "selected" : ""}>${m}</option>`
+  ).join("");
   return `
   <div class="field-row">
     <label>${label}</label>
-    <div class="field-triplet">
-      <input type="number" id="${idPrefix}-y" placeholder="سال" value="${defaults.jy}">
-      <input type="number" id="${idPrefix}-m" placeholder="ماه" min="1" max="12" value="${defaults.jm}">
-      <input type="number" id="${idPrefix}-d" placeholder="روز" min="1" max="31" value="${defaults.jd}">
+    <div class="date-field">
+      <div class="stepper">
+        <button type="button" class="step-btn" data-target="${idPrefix}-y" data-step="-1">−</button>
+        <input type="number" id="${idPrefix}-y" value="${defaults.y}">
+        <button type="button" class="step-btn" data-target="${idPrefix}-y" data-step="1">+</button>
+      </div>
+      <select class="month-select" id="${idPrefix}-m">${opts}</select>
+      <div class="stepper">
+        <button type="button" class="step-btn" data-target="${idPrefix}-d" data-step="-1" data-min="1" data-max="31">−</button>
+        <input type="number" id="${idPrefix}-d" min="1" max="31" value="${defaults.d}">
+        <button type="button" class="step-btn" data-target="${idPrefix}-d" data-step="1">+</button>
+      </div>
     </div>
   </div>`;
 }
 
+function readDateField(idPrefix) {
+  return {
+    y: parseInt(document.getElementById(`${idPrefix}-y`).value, 10),
+    m: parseInt(document.getElementById(`${idPrefix}-m`).value, 10),
+    d: parseInt(document.getElementById(`${idPrefix}-d`).value, 10),
+  };
+}
+
+function yearStepperRow(id, label, value) {
+  return `
+  <div class="field-row">
+    <label>${label}</label>
+    <div class="stepper">
+      <button type="button" class="step-btn" data-target="${id}" data-step="-1">−</button>
+      <input type="number" id="${id}" value="${value}">
+      <button type="button" class="step-btn" data-target="${id}" data-step="1">+</button>
+    </div>
+  </div>`;
+}
+
+function jalaliInputRow(idPrefix, label, defaults) {
+  return dateFieldRow(idPrefix, label, { y: defaults.jy, m: defaults.jm, d: defaults.jd }, MONTHS_FA);
+}
+
 function readJalaliInput(idPrefix) {
-  const jy = parseInt(document.getElementById(`${idPrefix}-y`).value, 10);
-  const jm = parseInt(document.getElementById(`${idPrefix}-m`).value, 10);
-  const jd = parseInt(document.getElementById(`${idPrefix}-d`).value, 10);
-  return { jy, jm, jd };
+  const { y, m, d } = readDateField(idPrefix);
+  return { jy: y, jm: m, jd: d };
 }
 
 function toolDateConverter() {
   const t = todayJalali();
+  const gToday = new Date();
+  const gDefault = { y: gToday.getFullYear(), m: gToday.getMonth() + 1, d: gToday.getDate() };
+  const jdnToday = gregorianToJDN(gDefault.y, gDefault.m, gDefault.d);
+  const hRaw = jdnToHijri(jdnToday);
+  const hDefault = { y: hRaw.hy, m: hRaw.hm, d: hRaw.hd };
+
   const html = `
-    <div class="tool-section">
-      <h3>جلالی به ترسایی و مهی</h3>
-      ${jalaliInputRow("jg", "روزشمار جلالی", t)}
-      <button class="tool-btn" id="jg-run">ترادیس کن</button>
-      <div class="tool-result" id="jg-result"></div>
+    <div class="conv-tabs">
+      <button class="conv-tab active" data-tab="jalali">جلالی</button>
+      <button class="conv-tab" data-tab="gregorian">ترسایی</button>
+      <button class="conv-tab" data-tab="hijri">مهی</button>
     </div>
-    <div class="tool-section">
-      <h3>ترسایی به جلالی</h3>
-      <div class="field-row">
-        <label>روزشمار ترسایی</label>
-        <input type="date" id="gj-input">
-      </div>
-      <button class="tool-btn" id="gj-run">ترادیس کن</button>
-      <div class="tool-result" id="gj-result"></div>
+    <div class="conv-panel" id="conv-panel-jalali">
+      ${dateFieldRow("cj", "روزشمار جلالی", t, MONTHS_FA)}
     </div>
-    <p class="tool-note">این ترادیسی بر پایه‌ی گاهشمار مهیِ جدولی انجام می‌شود، نه دیدِ مستقیم ماه، و ممکن است یک روز جابه‌جا باشد.</p>`;
+    <div class="conv-panel" id="conv-panel-gregorian" style="display:none">
+      ${dateFieldRow("cg", "روزشمار ترسایی", gDefault, GREG_MONTHS_FA)}
+    </div>
+    <div class="conv-panel" id="conv-panel-hijri" style="display:none">
+      ${dateFieldRow("ch", "روزشمار مهی", hDefault, HIJRI_MONTHS_FA)}
+    </div>
+    <button class="tool-btn" id="conv-run">ترادیس کن</button>
+    <div class="tool-result" id="conv-result"></div>
+    <p class="tool-note">ترادیسیِ مهی بر پایه‌ی گاهشمار جدولی انجام می‌شود، نه دیدِ مستقیم ماه، و ممکن است یک روز جابه‌جا باشد.</p>`;
   openModal("ترادیسیِ روزشمار", html);
 
-  document.getElementById("jg-run").addEventListener("click", () => {
-    const { jy, jm, jd } = readJalaliInput("jg");
-    const out = document.getElementById("jg-result");
-    if (!jy || !jm || !jd || jm < 1 || jm > 12 || jd < 1 || jd > jalaaliMonthLength(jy, jm)) {
-      out.textContent = "روزشمار نوشته‌شده پای‌مند نیست.";
-      return;
-    }
-    const g = toGregorian(jy, jm, jd);
-    const jdn = gregorianToJDN(g.gy, g.gm, g.gd);
-    const h = jdnToHijri(jdn);
-    out.innerHTML = `ترسایی: <b>${g.gy}-${pad2(g.gm)}-${pad2(g.gd)}</b>
-      <br>مهی (کمابیش): <b>${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}</b>`;
+  let activeTab = "jalali";
+  document.querySelectorAll(".conv-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".conv-tab").forEach((b) => b.classList.remove("active"));
+      tab.classList.add("active");
+      activeTab = tab.dataset.tab;
+      ["jalali", "gregorian", "hijri"].forEach((k) => {
+        document.getElementById(`conv-panel-${k}`).style.display = k === activeTab ? "" : "none";
+      });
+    });
   });
 
-  document.getElementById("gj-run").addEventListener("click", () => {
-    const val = document.getElementById("gj-input").value;
-    const out = document.getElementById("gj-result");
-    if (!val) { out.textContent = "یک روزشمار ترسایی برگزینید."; return; }
-    const [gy, gm, gd] = val.split("-").map((x) => parseInt(x, 10));
-    const j = toJalaali(gy, gm, gd);
-    out.textContent = `${toFaDigits(j.jy)}/${toFaDigits(pad2(j.jm))}/${toFaDigits(pad2(j.jd))} — ${MONTHS_FA[j.jm - 1]} ${toFaDigits(j.jy)}`;
+  document.getElementById("conv-run").addEventListener("click", () => {
+    const out = document.getElementById("conv-result");
+    let jy, jm, jd, gy, gm, gd, hy, hm, hd;
+
+    if (activeTab === "jalali") {
+      const v = readDateField("cj");
+      if (!v.y || !v.m || !v.d || v.d < 1 || v.d > jalaaliMonthLength(v.y, v.m)) {
+        out.textContent = "روزشمار نوشته‌شده پای‌مند نیست.";
+        return;
+      }
+      jy = v.y; jm = v.m; jd = v.d;
+      const g = toGregorian(jy, jm, jd);
+      gy = g.gy; gm = g.gm; gd = g.gd;
+    } else if (activeTab === "gregorian") {
+      const v = readDateField("cg");
+      if (!v.y || !v.m || !v.d) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
+      gy = v.y; gm = v.m; gd = v.d;
+      const j = toJalaali(gy, gm, gd);
+      jy = j.jy; jm = j.jm; jd = j.jd;
+    } else {
+      const v = readDateField("ch");
+      if (!v.y || !v.m || !v.d) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
+      const jdn = hijriToJDN(v.y, v.m, v.d);
+      const g = jdnToGregorian(jdn);
+      gy = g.gy; gm = g.gm; gd = g.gd;
+      const j = toJalaali(gy, gm, gd);
+      jy = j.jy; jm = j.jm; jd = j.jd;
+    }
+
+    const jdnFinal = gregorianToJDN(gy, gm, gd);
+    const h = jdnToHijri(jdnFinal);
+    hy = h.hy; hm = h.hm; hd = h.hd;
+
+    out.innerHTML = `
+      <div class="conv-result-grid">
+        <div class="conv-result-row"><span>جلالی</span><b>${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</b></div>
+        <div class="conv-result-row"><span>ترسایی</span><b>${gd} ${GREG_MONTHS_FA[gm - 1]} ${gy}</b></div>
+        <div class="conv-result-row"><span>مهی</span><b>${toFaDigits(hd)} ${HIJRI_MONTHS_FA[hm - 1]} ${toFaDigits(hy)}</b></div>
+      </div>`;
   });
 }
 
@@ -438,10 +542,7 @@ function toolYearAnimal() {
   const html = `
     <div class="tool-section">
       <h3>جانور سالِ زایش</h3>
-      <div class="field-row">
-        <label>سال جلالی</label>
-        <input type="number" id="animal-year" value="${t.jy}">
-      </div>
+      ${yearStepperRow("animal-year", "سال جلالی", t.jy)}
       <button class="tool-btn" id="animal-run">پیدا کن</button>
       <div class="tool-result" id="animal-result"></div>
       <p class="tool-note">بر پایه‌ی گاهشماری دوازده‌جانوریِ ترکی-مغولی که در ایران هم رواج داشته؛ تطبیقش با سال جلالی کمابیش است.</p>
@@ -580,10 +681,7 @@ function miniMonthHtml(jy, jm) {
 function toolYearView() {
   const t = todayJalali();
   const html = `
-    <div class="field-row">
-      <label>سال جلالی</label>
-      <input type="number" id="year-view-year" value="${t.jy}">
-    </div>
+    ${yearStepperRow("year-view-year", "سال جلالی", t.jy)}
     <button class="tool-btn" id="year-view-run">بنمای</button>
     <div class="year-grid" id="year-grid"></div>`;
   openModal("نمای سال", html);
@@ -620,7 +718,7 @@ function toolShareToday() {
     const status = document.getElementById("share-status");
     if (navigator.share) {
       try {
-        await navigator.share({ text, title: "تقویم سره" });
+        await navigator.share({ text, title: "گاهشمار سره" });
       } catch {}
     } else {
       status.textContent = "هم‌رسانی سرراست روی این مرورگر پشتیبانی نمی‌شود؛ از رونگاری به‌کار ببرید.";
@@ -711,12 +809,15 @@ function registerServiceWorker() {
   }
 }
 
+const SUN_SVG = `<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/></svg>`;
+const MOON_SVG = `<svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg>`;
+
 function main() {
   const today = todayJalali();
   const { jy, jm } = today;
 
+  document.getElementById("theme-toggle").innerHTML = SUN_SVG + MOON_SVG;
   applyTheme(localStorage.getItem(THEME_KEY) || "light");
-  updateTodayPill();
   updateClock();
   setInterval(updateClock, 1000);
 
