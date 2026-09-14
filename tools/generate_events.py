@@ -164,6 +164,16 @@ ALLOWED_EVENTS = {
     "کناره گیری رضا شاه از سلطنت به نفع پسرش محمدرضا پهلوی در پی اشغال ایران در جنگ جهانی دوم توسط نیروهای متفقین",
 }
 
+REGIONAL_EVENTS = {
+    "روز شیراز",
+    "روز زنجان",
+    "روز همدان",
+    "روز اصفهان",
+    "روز کرمان",
+    "روز چهارمحال و بختیاری",
+    "روز بوشهر",
+}
+
 import json
 import os
 import jdatetime
@@ -173,6 +183,7 @@ START_YEAR = 1400
 END_YEAR = 1430
 
 OUT_PATH = os.path.join(os.path.dirname(__file__), "..", "assets", "events-data.js")
+REGIONAL_OUT_PATH = os.path.join(os.path.dirname(__file__), "..", "assets", "events-regional.js")
 
 
 def month_length(jy: int, jm: int) -> int:
@@ -185,6 +196,7 @@ def month_length(jy: int, jm: int) -> int:
 
 def main():
     data = {}
+    regional = {}
     for jy in range(START_YEAR, END_YEAR + 1):
         for jm in range(1, 13):
             for jd in range(1, month_length(jy, jm) + 1):
@@ -197,12 +209,24 @@ def main():
                 if events or is_holiday:
                     key = f"{jy:04d}-{jm:02d}-{jd:02d}"
                     data[key] = {"events": events, "is_holiday": is_holiday}
+
+                regional_events = [e["description"] for e in info["events"]["jalali"] if e["description"] in REGIONAL_EVENTS]
+                if regional_events:
+                    key = f"{jy:04d}-{jm:02d}-{jd:02d}"
+                    regional[key] = regional_events
+
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         f.write("window.SARE_EVENTS = ")
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
         f.write(";\n")
     print(f"{OUT_PATH} -> {len(data)} / {START_YEAR}-{END_YEAR}")
+
+    with open(REGIONAL_OUT_PATH, "w", encoding="utf-8") as f:
+        f.write("window.SARE_EVENTS_REGIONAL = ")
+        json.dump(regional, f, ensure_ascii=False, separators=(",", ":"))
+        f.write(";\n")
+    print(f"{REGIONAL_OUT_PATH} -> {len(regional)} / {START_YEAR}-{END_YEAR}")
 
 
 if __name__ == "__main__":
