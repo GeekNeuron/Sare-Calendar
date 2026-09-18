@@ -255,7 +255,7 @@ function renderDayDetail(jy, jm, jd) {
     ? `<ul class="detail-event-list">${events.map((e) => {
         const ctx = EVENT_CONTEXT[e];
         if (ctx) {
-          return `<li class="expandable"><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span><span class="ev-arrow">›</span></span><p class="ev-context">${escapeHtml(ctx)}</p></li>`;
+          return `<li class="expandable"><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span><span class="ev-arrow">›</span></span></li>`;
         }
         return `<li><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span></span></li>`;
       }).join("")}</ul>`
@@ -271,8 +271,12 @@ function renderDayDetail(jy, jm, jd) {
     </div>
     ${eventsHtml}
     ${noteHtml}`;
-  holder.querySelectorAll(".detail-event-list li.expandable").forEach((li) => {
-    li.addEventListener("click", () => li.classList.toggle("open"));
+  const withContext = events.filter((e) => EVENT_CONTEXT[e]);
+  holder.querySelectorAll(".detail-event-list li.expandable").forEach((li, i) => {
+    const eventText = withContext[i];
+    li.addEventListener("click", () => {
+      openModal(eventText, `<p class="popup-text">${escapeHtml(EVENT_CONTEXT[eventText])}</p>`);
+    });
   });
   void holder.offsetWidth;
   holder.classList.add("refresh");
@@ -661,6 +665,12 @@ function toolNotes() {
       <h3>یادداشت‌های شما</h3>
       <div id="note-list-holder">${renderList()}</div>
       <p class="tool-note">یادداشت‌ها فقط در همین مرورگر و روی همین دستگاه نگاه‌داری می‌شوند.</p>
+      <div class="btn-row">
+        <button class="tool-btn secondary" id="export-notes-btn">برون‌ریزی (JSON)</button>
+        <label class="tool-btn secondary" for="import-notes-input">درون‌ریزی</label>
+        <input type="file" id="import-notes-input" accept="application/json" style="display:none">
+      </div>
+      <div class="tool-note" id="notes-io-status"></div>
     </div>`;
   openModal("یادداشت‌ها", html);
 
@@ -678,6 +688,39 @@ function toolNotes() {
     });
   };
   attachDeleteHandlers();
+
+  document.getElementById("export-notes-btn").addEventListener("click", () => {
+    const data = JSON.stringify(loadNotes(), null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sare-calendar-notes.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("import-notes-input").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    const status = document.getElementById("notes-io-status");
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(reader.result);
+        const merged = { ...loadNotes(), ...imported };
+        saveNotes(merged);
+        document.getElementById("note-list-holder").innerHTML = renderList();
+        attachDeleteHandlers();
+        status.textContent = "یادداشت‌ها درون‌ریزی شدند.";
+        const cur = document.querySelector("main");
+        render(Number(cur.dataset.jy), Number(cur.dataset.jm));
+      } catch {
+        status.textContent = "فایل معتبر نبود.";
+      }
+    };
+    reader.readAsText(file);
+  });
 
   document.getElementById("note-add").addEventListener("click", () => {
     const { jy, jm, jd } = readJalaliInput("note");
@@ -746,8 +789,10 @@ function toolShareToday() {
   const html = `
     <div class="tool-section">
       <div class="tool-result" id="share-text" style="white-space:pre-line">${escapeHtml(text)}</div>
-      <button class="tool-btn" id="share-run">هم‌رسانی</button>
-      <button class="tool-btn secondary" id="copy-run">رونگاری نوشته</button>
+      <div class="btn-row">
+        <button class="tool-btn" id="share-run">هم‌رسانی</button>
+        <button class="tool-btn secondary" id="copy-run">رونگاری نوشته</button>
+      </div>
       <div class="tool-note" id="share-status"></div>
     </div>`;
   openModal("هم‌رسانیِ امروز", html);
@@ -774,9 +819,35 @@ function toolShareToday() {
   });
 }
 
+function normalizePersianLetter(ch) {
+  if (ch === "ك") return "ک";
+  if (ch === "ي") return "ی";
+  return ch;
+}
+
+function pasbanLetters() {
+  const set = new Set();
+  Object.keys(PASBAN_WORDS).forEach((w) => {
+    const ch = normalizePersianLetter(w[0]);
+    if (/\p{L}/u.test(ch)) set.add(ch);
+  });
+  return [...set].sort((a, b) => a.localeCompare(b, "fa"));
+}
+
+function pasbanWordsByLetter(letter) {
+  const entries = Object.entries(PASBAN_WORDS).filter(([w]) => normalizePersianLetter(w[0]) === letter);
+  entries.sort((a, b) => a[0].localeCompare(b[0], "fa"));
+  return entries;
+}
+
 function toolWordFinder() {
+  const letters = pasbanLetters();
   const html = `
-    <div class="tool-section">
+    <div class="conv-tabs">
+      <button class="conv-tab active" data-tab="search">جست‌وجو</button>
+      <button class="conv-tab" data-tab="browse">مرور الفبایی</button>
+    </div>
+    <div class="conv-panel" id="wf-panel-search">
       <div class="field-row">
         <label>واژه را بنویسید</label>
         <input type="text" id="word-input" placeholder="برای نمونه: کامپیوتر">
@@ -784,8 +855,21 @@ function toolWordFinder() {
       <button class="tool-btn" id="word-run">بجوی</button>
       <div class="tool-result" id="word-result"></div>
     </div>
+    <div class="conv-panel" id="wf-panel-browse" style="display:none">
+      <div class="letter-grid">${letters.map((l) => `<button class="letter-btn" data-letter="${l}">${l}</button>`).join("")}</div>
+      <div id="glossary-holder"></div>
+    </div>
     <p class="tool-note">این جستار از پایگاه‌داده‌ی آزادِ «پاسبان» (Pasban) بهره می‌برد — بیش از ۲۰هزار واژه‌ی بیگانه با برابرِ پارسیِ سره. <a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">pasban_db</a></p>`;
   openModal("واژه‌یاب سره", html);
+
+  document.querySelectorAll(".conv-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".conv-tab").forEach((b) => b.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("wf-panel-search").style.display = tab.dataset.tab === "search" ? "" : "none";
+      document.getElementById("wf-panel-browse").style.display = tab.dataset.tab === "browse" ? "" : "none";
+    });
+  });
 
   const run = () => {
     const q = document.getElementById("word-input").value.trim();
@@ -804,6 +888,38 @@ function toolWordFinder() {
   };
   document.getElementById("word-run").addEventListener("click", run);
   document.getElementById("word-input").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
+
+  const BATCH_SIZE = 150;
+  document.querySelectorAll(".letter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".letter-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const entries = pasbanWordsByLetter(btn.dataset.letter);
+      let shown = 0;
+      const holder = document.getElementById("glossary-holder");
+
+      const renderBatch = () => {
+        const next = entries.slice(shown, shown + BATCH_SIZE);
+        const listHtml = next.map(([w, p]) => `<li><b>${escapeHtml(w)}</b> ← ${escapeHtml(p)}</li>`).join("");
+        let list = holder.querySelector(".glossary-list");
+        if (!list) {
+          holder.innerHTML = `<ul class="glossary-list"></ul>`;
+          list = holder.querySelector(".glossary-list");
+        }
+        list.insertAdjacentHTML("beforeend", listHtml);
+        shown += next.length;
+        const moreBtn = holder.querySelector("#glossary-more");
+        if (moreBtn) moreBtn.remove();
+        if (shown < entries.length) {
+          holder.insertAdjacentHTML("beforeend",
+            `<button class="tool-btn secondary" id="glossary-more">نمایش بیشتر (${toFaDigits(entries.length - shown)} مورد دیگر)</button>`);
+          document.getElementById("glossary-more").addEventListener("click", renderBatch);
+        }
+      };
+      holder.innerHTML = "";
+      renderBatch();
+    });
+  });
 }
 
 function searchEvents(query) {
@@ -869,7 +985,25 @@ function toolEventSearch() {
 
 function toolSettings() {
   const on = regionalEnabled();
+  const curTheme = localStorage.getItem(THEME_KEY) || "light";
+  const curFont = localStorage.getItem(FONT_SIZE_KEY) || "md";
   const html = `
+    <div class="tool-section">
+      <h3>پوسته</h3>
+      <div class="seg-control" id="theme-seg">
+        <button class="seg-btn ${curTheme === "light" ? "active" : ""}" data-value="light">روشن</button>
+        <button class="seg-btn ${curTheme === "dark" ? "active" : ""}" data-value="dark">تاریک</button>
+        <button class="seg-btn ${curTheme === "auto" ? "active" : ""}" data-value="auto">خودکار (پیرو سیستم)</button>
+      </div>
+    </div>
+    <div class="tool-section">
+      <h3>اندازه‌ی نوشته</h3>
+      <div class="seg-control" id="font-seg">
+        <button class="seg-btn ${curFont === "sm" ? "active" : ""}" data-value="sm">کوچک</button>
+        <button class="seg-btn ${curFont === "md" ? "active" : ""}" data-value="md">متوسط</button>
+        <button class="seg-btn ${curFont === "lg" ? "active" : ""}" data-value="lg">بزرگ</button>
+      </div>
+    </div>
     <div class="tool-section">
       <div class="toggle-row">
         <div>
@@ -878,8 +1012,40 @@ function toolSettings() {
         </div>
         <button class="toggle-switch ${on ? "on" : ""}" id="regional-toggle" role="switch" aria-checked="${on}"><span class="toggle-knob"></span></button>
       </div>
+    </div>
+    <div class="tool-section">
+      <h3>یادداشت‌ها</h3>
+      <button class="tool-btn danger" id="clear-notes-btn">پاک‌کردن همه‌ی یادداشت‌ها</button>
+    </div>
+    <div class="tool-section about-section">
+      <h3>درباره</h3>
+      <p class="popup-text">گاهشمار سره یک تقویم جلالیِ آزاد و متن‌باز است — سرشار از تاریخ و فرهنگ ایران، بدون شلوغی، و به‌طور کامل در همین مرورگر اجرا می‌شود.</p>
+      <ul class="about-list">
+        <li>تبدیل گاهشماری: <a href="https://github.com/jalaali/jalaali-js" target="_blank" rel="noopener">jalaali-js</a> (MIT)</li>
+        <li>داده‌ی رخدادها: بستهٔ آزاد <a href="https://github.com/openscilab/rokh" target="_blank" rel="noopener">rokh</a></li>
+        <li>واژه‌یاب سره: پایگاه‌داده‌ی <a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">پاسبان</a> (Pasban)</li>
+        <li>فونت: <a href="https://github.com/rastikerdar/vazirmatn" target="_blank" rel="noopener">وزیرمتن</a> (SIL OFL)</li>
+      </ul>
+      <p class="tool-note">جزئیات گزینش رخدادها در <a href="CURATION-NOTES.md" target="_blank" rel="noopener">CURATION-NOTES.md</a> آمده است.</p>
+      <p class="tool-note">نگارش ${SARE_VERSION}</p>
     </div>`;
   openModal("تنظیمات", html);
+
+  document.querySelectorAll("#theme-seg .seg-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#theme-seg .seg-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      setThemePref(btn.dataset.value);
+    });
+  });
+
+  document.querySelectorAll("#font-seg .seg-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#font-seg .seg-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      setFontSizePref(btn.dataset.value);
+    });
+  });
 
   document.getElementById("regional-toggle").addEventListener("click", (e) => {
     const btn = e.currentTarget;
@@ -887,6 +1053,25 @@ function toolSettings() {
     btn.classList.toggle("on", next);
     btn.setAttribute("aria-checked", String(next));
     localStorage.setItem(REGIONAL_KEY, next ? "on" : "off");
+    const cur = document.querySelector("main");
+    render(Number(cur.dataset.jy), Number(cur.dataset.jm));
+  });
+
+  let clearArmed = false;
+  document.getElementById("clear-notes-btn").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    if (!clearArmed) {
+      clearArmed = true;
+      btn.textContent = "مطمئنید؟ (دوباره بزنید)";
+      setTimeout(() => {
+        clearArmed = false;
+        btn.textContent = "پاک‌کردن همه‌ی یادداشت‌ها";
+      }, 3000);
+      return;
+    }
+    saveNotes({});
+    clearArmed = false;
+    btn.textContent = "همه‌ی یادداشت‌ها پاک شد";
     const cur = document.querySelector("main");
     render(Number(cur.dataset.jy), Number(cur.dataset.jm));
   });
@@ -919,14 +1104,36 @@ function buildSideMenu() {
 }
 
 const THEME_KEY = "sareTheme";
+const FONT_SIZE_KEY = "sareFontSize";
+const SARE_VERSION = "۱.۰";
 
-function applyTheme(theme) {
-  document.documentElement.classList.toggle("dark", theme === "dark");
+function systemPrefersDark() {
+  return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+
+function applyTheme(pref) {
+  const dark = pref === "auto" ? systemPrefersDark() : pref === "dark";
+  document.documentElement.classList.toggle("dark", dark);
 }
 
 function toggleTheme() {
   const isDark = document.documentElement.classList.toggle("dark");
   localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+}
+
+function setThemePref(pref) {
+  localStorage.setItem(THEME_KEY, pref);
+  applyTheme(pref);
+}
+
+function applyFontSize(size) {
+  document.documentElement.classList.remove("font-sm", "font-md", "font-lg");
+  document.documentElement.classList.add(`font-${size}`);
+}
+
+function setFontSizePref(size) {
+  localStorage.setItem(FONT_SIZE_KEY, size);
+  applyFontSize(size);
 }
 
 function registerServiceWorker() {
@@ -944,6 +1151,12 @@ function main() {
 
   document.getElementById("theme-toggle").innerHTML = SUN_SVG + MOON_SVG;
   applyTheme(localStorage.getItem(THEME_KEY) || "light");
+  applyFontSize(localStorage.getItem(FONT_SIZE_KEY) || "md");
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if ((localStorage.getItem(THEME_KEY) || "light") === "auto") applyTheme("auto");
+    });
+  }
   updateClock();
   setInterval(updateClock, 1000);
 
