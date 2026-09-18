@@ -11,7 +11,11 @@
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="stylesheet" href="assets/style.css">
 <script>
-if (localStorage.getItem("sareTheme") === "dark") document.documentElement.classList.add("dark");
+var t = localStorage.getItem("sareTheme");
+if (t === "dark" || (t === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+  document.documentElement.classList.add("dark");
+}
+document.documentElement.classList.add("font-" + (localStorage.getItem("sareFontSize") || "md"));
 </script>
 </head>
 <body>
@@ -65,7 +69,6 @@ if (localStorage.getItem("sareTheme") === "dark") document.documentElement.class
 
   <footer class="foot-note">
     <p>روزهای <span class="dot holiday-dot"></span> فرویش‌اند.</p>
-    <p class="tiny">واژه‌یاب سره با بهره از پایگاه‌داده‌ی «پاسبان» (<a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">Pasban</a>)</p>
   </footer>
 </div>
 
