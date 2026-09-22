@@ -9,7 +9,7 @@ const ASSETS = [
   "./assets/event-context.js",
   "./assets/history-facts.js",
   "./assets/proverbs.js",
-  "./assets/pasban-words.js",
+  "./assets/pasban-words.json",
   "./assets/vendor/jalaali.js",
   "./assets/fonts/Vazirmatn-Regular.woff2",
   "./assets/fonts/Vazirmatn-Medium.woff2",

@@ -53,7 +53,19 @@ const EVENTS_REGIONAL = window.SARE_EVENTS_REGIONAL || {};
 const HISTORY_FACTS = window.SARE_HISTORY_FACTS || [];
 const PROVERBS = window.SARE_PROVERBS || [];
 const EVENT_CONTEXT = window.SARE_EVENT_CONTEXT || {};
-const PASBAN_WORDS = window.SARE_PASBAN_WORDS || {};
+let PASBAN_WORDS = null;
+let pasbanLoadPromise = null;
+
+function loadPasbanWords() {
+  if (PASBAN_WORDS) return Promise.resolve(PASBAN_WORDS);
+  if (!pasbanLoadPromise) {
+    pasbanLoadPromise = fetch("assets/pasban-words.json")
+      .then((r) => r.json())
+      .then((data) => { PASBAN_WORDS = data; return data; })
+      .catch(() => { PASBAN_WORDS = {}; return PASBAN_WORDS; });
+  }
+  return pasbanLoadPromise;
+}
 
 const REGIONAL_KEY = "sareRegionalEvents";
 const regionalEnabled = () => localStorage.getItem(REGIONAL_KEY) === "on";
@@ -352,19 +364,8 @@ function stableDayNumber(jy, jm, jd) {
 
 function renderFactOfTheDay() {
   const el = document.getElementById("fact-text");
-  if (!el) return;
+  if (!el || !HISTORY_FACTS.length) return;
   const t = todayJalali();
-  const info = dayInfo(t.jy, t.jm, t.jd);
-  const jashn = jashnFor(t.jm, t.jd);
-  const todaysEvents = jashn ? [jashn, ...(info.events || [])] : (info.events || []);
-  if (todaysEvents.length) {
-    const idx = stableDayNumber(t.jy, t.jm, t.jd) % todaysEvents.length;
-    const chosen = todaysEvents[idx];
-    const ctx = EVENT_CONTEXT[chosen];
-    el.textContent = ctx ? `${chosen} ${ctx}` : chosen;
-    return;
-  }
-  if (!HISTORY_FACTS.length) return;
   const idx = stableDayNumber(t.jy, t.jm, t.jd) % HISTORY_FACTS.length;
   el.textContent = HISTORY_FACTS[idx];
 }
@@ -841,6 +842,14 @@ function pasbanWordsByLetter(letter) {
 }
 
 function toolWordFinder() {
+  openModal("واژه‌یاب سره", `<p class="tool-note">در حال آماده‌سازی واژه‌نامه…</p>`);
+  loadPasbanWords().then(() => {
+    if (!document.getElementById("modal-overlay").classList.contains("visible")) return;
+    renderWordFinderBody();
+  });
+}
+
+function renderWordFinderBody() {
   const letters = pasbanLetters();
   const html = `
     <div class="conv-tabs">
