@@ -1,4 +1,4 @@
-const CACHE_NAME = "sare-calendar-v1";
+const CACHE_NAME = "sare-calendar-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const ASSETS = [
   "./assets/history-facts.js",
   "./assets/proverbs.js",
   "./assets/pasban-words.json",
+  "./assets/persian-names.json",
   "./assets/vendor/jalaali.js",
   "./assets/fonts/Vazirmatn-Regular.woff2",
   "./assets/fonts/Vazirmatn-Medium.woff2",

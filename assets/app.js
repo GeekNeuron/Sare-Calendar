@@ -55,6 +55,8 @@ const PROVERBS = window.SARE_PROVERBS || [];
 const EVENT_CONTEXT = window.SARE_EVENT_CONTEXT || {};
 let PASBAN_WORDS = null;
 let pasbanLoadPromise = null;
+let PERSIAN_NAMES = null;
+let namesLoadPromise = null;
 
 function loadPasbanWords() {
   if (PASBAN_WORDS) return Promise.resolve(PASBAN_WORDS);
@@ -65,6 +67,17 @@ function loadPasbanWords() {
       .catch(() => { PASBAN_WORDS = {}; return PASBAN_WORDS; });
   }
   return pasbanLoadPromise;
+}
+
+function loadPersianNames() {
+  if (PERSIAN_NAMES) return Promise.resolve(PERSIAN_NAMES);
+  if (!namesLoadPromise) {
+    namesLoadPromise = fetch("assets/persian-names.json")
+      .then((r) => r.json())
+      .then((data) => { PERSIAN_NAMES = data; return data; })
+      .catch(() => { namesLoadPromise = null; return null; });
+  }
+  return namesLoadPromise;
 }
 
 const REGIONAL_KEY = "sareRegionalEvents";
@@ -931,6 +944,77 @@ function renderWordFinderBody() {
   });
 }
 
+function normalizeFa(text) {
+  return text.replace(/ك/g, "ک").replace(/ي/g, "ی").replace(/[\u200c\u064b-\u0652]/g, "").trim();
+}
+
+const NAME_GENDER_LABEL = { m: "پسرانه", f: "دخترانه", u: "هر دو" };
+
+function toolPersianNames() {
+  openModal("نام‌های پارسی", `<p class="tool-note">در حال آماده‌سازی نام‌ها…</p>`);
+  loadPersianNames().then((names) => {
+    if (!document.getElementById("modal-overlay").classList.contains("visible")) return;
+    if (!names) {
+      document.getElementById("modal-body").innerHTML = `<p class="tool-note">بارگذاری نام‌ها شدنی نبود؛ اتصال را بررسی کنید و دوباره بکوشید.</p>`;
+      return;
+    }
+    renderPersianNamesBody(names);
+  });
+}
+
+function renderPersianNamesBody(names) {
+  const html = `
+    <div class="conv-tabs" id="names-tabs">
+      <button class="conv-tab active" data-gender="all">همه</button>
+      <button class="conv-tab" data-gender="m">پسرانه</button>
+      <button class="conv-tab" data-gender="f">دخترانه</button>
+    </div>
+    <div class="field-row">
+      <input type="text" id="names-input" placeholder="نام یا معنا را بجویید">
+    </div>
+    <div class="tool-note" id="names-count"></div>
+    <ul class="name-list" id="names-list"></ul>
+    <p class="tool-note">همه‌ی نام‌ها ریشه‌ی ایرانی دارند (اوستایی، پارسی باستان، پارسی میانه یا پارسی نو). برای برخی نام‌ها پیشنهادهای ریشه‌شناختیِ گوناگونی هست و این‌جا رایج‌ترینشان آمده است. نام‌های «هر دو» برای پسر و دختر به‌کار می‌روند.</p>`;
+  openModal("نام‌های پارسی", html);
+
+  let gender = "all";
+  const list = document.getElementById("names-list");
+  const count = document.getElementById("names-count");
+  const input = document.getElementById("names-input");
+
+  const draw = () => {
+    const q = normalizeFa(input.value);
+    const shown = names
+      .filter((e) => gender === "all" || e.g === gender || e.g === "u")
+      .filter((e) => !q || normalizeFa(e.n).includes(q) || normalizeFa(e.m).includes(q))
+      .sort((a, b) => a.n.localeCompare(b.n, "fa"));
+    count.textContent = shown.length ? `${toFaDigits(shown.length)} نام` : "";
+    if (!shown.length) {
+      list.innerHTML = `<li class="name-empty">چیزی یافت نشد.</li>`;
+      return;
+    }
+    list.innerHTML = shown.map((e) => `
+      <li>
+        <div class="name-head"><b>${escapeHtml(e.n)}</b><span class="name-tag ${e.g}">${NAME_GENDER_LABEL[e.g]}</span></div>
+        <div class="name-meaning">${escapeHtml(e.m)}</div>
+        <div class="name-root">ریشه: ${escapeHtml(e.r)}</div>
+        ${e.x ? `<div class="name-note">${escapeHtml(e.x)}</div>` : ""}
+      </li>`).join("");
+    list.scrollTop = 0;
+  };
+
+  document.querySelectorAll("#names-tabs .conv-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("#names-tabs .conv-tab").forEach((b) => b.classList.remove("active"));
+      tab.classList.add("active");
+      gender = tab.dataset.gender;
+      draw();
+    });
+  });
+  input.addEventListener("input", draw);
+  draw();
+}
+
 function searchEvents(query) {
   const q = query.trim();
   if (!q) return [];
@@ -1033,9 +1117,9 @@ function toolSettings() {
         <li>تبدیل گاهشماری: <a href="https://github.com/jalaali/jalaali-js" target="_blank" rel="noopener">jalaali-js</a> (MIT)</li>
         <li>داده‌ی رخدادها: بستهٔ آزاد <a href="https://github.com/openscilab/rokh" target="_blank" rel="noopener">rokh</a></li>
         <li>واژه‌یاب سره: پایگاه‌داده‌ی <a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">پاسبان</a> (Pasban)</li>
+        <li>نام‌های پارسی: فهرستی گزیده با ریشه‌ی ایرانی، گردآوری‌شده برای همین پروژه</li>
         <li>فونت: <a href="https://github.com/rastikerdar/vazirmatn" target="_blank" rel="noopener">وزیرمتن</a> (SIL OFL)</li>
       </ul>
-      <p class="tool-note">جزئیات گزینش رخدادها در <a href="CURATION-NOTES.md" target="_blank" rel="noopener">CURATION-NOTES.md</a> آمده است.</p>
       <p class="tool-note">نگارش ${SARE_VERSION}</p>
     </div>`;
   openModal("تنظیمات", html);
@@ -1096,6 +1180,7 @@ const TOOLS = {
   "share-today": { label: "هم‌رسانیِ امروز", run: toolShareToday },
   "event-search": { label: "جست‌وجوی رخداد", run: toolEventSearch },
   "word-finder": { label: "واژه‌یاب سره", run: toolWordFinder },
+  "persian-names": { label: "نام‌های پارسی", run: toolPersianNames },
   "settings": { label: "تنظیمات", run: toolSettings },
 };
 
@@ -1114,7 +1199,7 @@ function buildSideMenu() {
 
 const THEME_KEY = "sareTheme";
 const FONT_SIZE_KEY = "sareFontSize";
-const SARE_VERSION = "۱.۰";
+const SARE_VERSION = "۱.۱";
 
 function systemPrefersDark() {
   return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);

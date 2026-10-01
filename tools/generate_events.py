@@ -15,10 +15,6 @@ ALLOWED_EVENTS = {
     "بزرگداشت خواجوی کرمانی",
     "بزرگداشت رودکی",
     "بزرگداشت سید جمال‌الدین اسدآبادی",
-    "بزرگداشت شیخ صدوق",
-    "بزرگداشت شیخ صفی‌الدین اردبیلی",
-    "بزرگداشت شیخ مفید",
-    "بزرگداشت شیخ کلینی",
     "بزرگداشت صفی‌الدین اُرمَوی و روز موسیقی ایرانی",
     "بزرگداشت نظامی گنجوی",
     "تأسیس باشگاه فوتبال استقلال (تاج)",
@@ -164,6 +160,27 @@ ALLOWED_EVENTS = {
     "کناره گیری رضا شاه از سلطنت به نفع پسرش محمدرضا پهلوی در پی اشغال ایران در جنگ جهانی دوم توسط نیروهای متفقین",
 }
 
+NATURAL_EVENTS = {
+    "زمین لرزه طبس به قدرت 7/8 ریشتر",
+    "زمین لرزه ی بم [1382 خورشیدی]",
+    "سالروز زلزله رودبار و منجیل [1369خورشیدی]",
+    "روز ایمنی در برابر زلزله و کاهش اثرات بلایای طبیعی",
+    "روز طبیعت",
+    "روز درختکاری",
+    "روز آموزش همگانی حفظ محیط زیست",
+    "روز محیط" + "\u200c" * 13 + " بان",
+    "روز ذخایر ژنتیکی و زیستی",
+    "روز ملی گل وگیاه",
+}
+
+EXTRA_FESTIVALS = {
+    "جشن خرم روز، نخستین جشن دیگان",
+    "جشن نوسره",
+    "جشن خام خواری",
+}
+
+KEPT_EVENTS = ALLOWED_EVENTS | NATURAL_EVENTS | EXTRA_FESTIVALS
+
 REGIONAL_EVENTS = {
     "روز شیراز",
     "روز زنجان",
@@ -201,7 +218,7 @@ def main():
         for jm in range(1, 13):
             for jd in range(1, month_length(jy, jm) + 1):
                 info = get_events(day=jd, month=jm, year=jy, input_date_system=DateSystem.JALALI)
-                jalali_events = [e for e in info["events"]["jalali"] if e["description"] in ALLOWED_EVENTS]
+                jalali_events = [e for e in info["events"]["jalali"] if e["description"] in KEPT_EVENTS]
                 events = [e["description"] for e in jalali_events]
                 is_holiday = any(e["is_holiday"] for e in jalali_events) or any(
                     e["is_holiday"] for e in info["events"]["hijri"]
