@@ -53,10 +53,16 @@ const EVENTS_REGIONAL = window.SARE_EVENTS_REGIONAL || {};
 const HISTORY_FACTS = window.SARE_HISTORY_FACTS || [];
 const PROVERBS = window.SARE_PROVERBS || [];
 const EVENT_CONTEXT = window.SARE_EVENT_CONTEXT || {};
+const EVENTS_NATURAL = window.SARE_EVENTS_NATURAL || {};
+const NATURAL_CONTEXT = window.SARE_NATURAL_CONTEXT || {};
+const PERSIAN_NAMES = window.SARE_PERSIAN_NAMES || [];
+
+// توضیحِ پاپ‌آپِ یک رخداد؛ رخدادهای طبیعیِ نجومی «نوشته · ساعت …» هستند و کلیدشان بخشِ پیش از « · » است.
+function contextFor(e) {
+  return EVENT_CONTEXT[e] || NATURAL_CONTEXT[e.split(" · ")[0]] || null;
+}
 let PASBAN_WORDS = null;
 let pasbanLoadPromise = null;
-let PERSIAN_NAMES = null;
-let namesLoadPromise = null;
 
 function loadPasbanWords() {
   if (PASBAN_WORDS) return Promise.resolve(PASBAN_WORDS);
@@ -69,17 +75,6 @@ function loadPasbanWords() {
   return pasbanLoadPromise;
 }
 
-function loadPersianNames() {
-  if (PERSIAN_NAMES) return Promise.resolve(PERSIAN_NAMES);
-  if (!namesLoadPromise) {
-    namesLoadPromise = fetch("assets/persian-names.json")
-      .then((r) => r.json())
-      .then((data) => { PERSIAN_NAMES = data; return data; })
-      .catch(() => { namesLoadPromise = null; return null; });
-  }
-  return namesLoadPromise;
-}
-
 const REGIONAL_KEY = "sareRegionalEvents";
 const regionalEnabled = () => localStorage.getItem(REGIONAL_KEY) === "on";
 
@@ -88,10 +83,15 @@ function pad2(n) { return String(n).padStart(2, "0"); }
 function dayInfo(jy, jm, jd) {
   const key = `${jy}-${pad2(jm)}-${pad2(jd)}`;
   const base = EVENTS[key] || { events: [], is_holiday: false };
-  if (regionalEnabled() && EVENTS_REGIONAL[key]) {
-    return { events: [...base.events, ...EVENTS_REGIONAL[key]], is_holiday: base.is_holiday };
-  }
-  return base;
+  let events = base.events;
+  if (EVENTS_NATURAL[key]) events = [...events, ...EVENTS_NATURAL[key]];
+  if (regionalEnabled() && EVENTS_REGIONAL[key]) events = [...events, ...EVENTS_REGIONAL[key]];
+  return events === base.events ? base : { events, is_holiday: base.is_holiday };
+}
+
+// ماه‌های ۳۱روزه روزِ سی‌ویکم را بی‌نام دارند؛ پیش‌تر به‌اشتباه «هرمزد» نشان داده می‌شد.
+function dayNameFor(d) {
+  return d > 30 ? "—" : ZOROASTRIAN_DAY_NAMES[d - 1];
 }
 
 function jashnFor(jm, jd) {
@@ -217,7 +217,7 @@ function buildMonthGrid(jy, jm) {
     cells.push({
       day: d,
       dayFa: toFaDigits(d),
-      dayNameFa: ZOROASTRIAN_DAY_NAMES[(d - 1) % 30],
+      dayNameFa: dayNameFor(d),
       gregorianLabel: `${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]}`,
       isToday: today.jy === jy && today.jm === jm && today.jd === d,
       isHoliday: !!info.is_holiday,
@@ -271,14 +271,14 @@ function renderDayDetail(jy, jm, jd) {
   const info = dayInfo(jy, jm, jd);
   const jashn = jashnFor(jm, jd);
   const events = jashn ? [jashn, ...(info.events || [])] : (info.events || []);
-  const dayName = ZOROASTRIAN_DAY_NAMES[(jd - 1) % 30];
+  const dayName = dayNameFor(jd);
   const notes = loadNotes();
   const noteKey = `${jy}-${pad2(jm)}-${pad2(jd)}`;
   const note = notes[noteKey];
 
   const eventsHtml = events.length
     ? `<ul class="detail-event-list">${events.map((e) => {
-        const ctx = EVENT_CONTEXT[e];
+        const ctx = contextFor(e);
         if (ctx) {
           return `<li class="expandable"><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span><span class="ev-arrow">›</span></span></li>`;
         }
@@ -292,15 +292,15 @@ function renderDayDetail(jy, jm, jd) {
   holder.innerHTML = `
     <div class="detail-header">
       <span class="detail-date">${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</span>
-      <span class="detail-sub">${dayName} · ${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]} ${g.gy} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · فرویش" : ""}</span>
+      <span class="detail-sub">${dayName === "—" ? "" : dayName + " · "}${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]} ${g.gy} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · فرویش" : ""}</span>
     </div>
     ${eventsHtml}
     ${noteHtml}`;
-  const withContext = events.filter((e) => EVENT_CONTEXT[e]);
+  const withContext = events.filter((e) => contextFor(e));
   holder.querySelectorAll(".detail-event-list li.expandable").forEach((li, i) => {
     const eventText = withContext[i];
     li.addEventListener("click", () => {
-      openModal(eventText, `<p class="popup-text">${escapeHtml(EVENT_CONTEXT[eventText])}</p>`);
+      openModal(eventText.split(" · ")[0], `<p class="popup-text">${escapeHtml(contextFor(eventText))}</p>${eventText.includes(" · ") ? `<p class="tool-note">${escapeHtml(eventText.split(" · ").slice(1).join(" · "))}</p>` : ""}`);
     });
   });
   void holder.offsetWidth;
@@ -379,6 +379,13 @@ function renderFactOfTheDay() {
   const el = document.getElementById("fact-text");
   if (!el || !HISTORY_FACTS.length) return;
   const t = todayJalali();
+  const withCtx = (dayInfo(t.jy, t.jm, t.jd).events || []).filter((e) => contextFor(e));
+  if (withCtx.length) {
+    const ev = withCtx[stableDayNumber(t.jy, t.jm, t.jd) % withCtx.length];
+    const firstSentence = contextFor(ev).split(/(?<=[.؟!])\s/)[0];
+    el.textContent = `${ev.split(" · ")[0]} — ${firstSentence}`;
+    return;
+  }
   const idx = stableDayNumber(t.jy, t.jm, t.jd) % HISTORY_FACTS.length;
   el.textContent = HISTORY_FACTS[idx];
 }
@@ -534,13 +541,13 @@ function toolDateConverter() {
       gy = g.gy; gm = g.gm; gd = g.gd;
     } else if (activeTab === "gregorian") {
       const v = readDateField("cg");
-      if (!v.y || !v.m || !v.d) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
+      if (!v.y || !v.m || !v.d || v.d < 1 || v.d > new Date(Date.UTC(v.y, v.m, 0)).getUTCDate()) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
       gy = v.y; gm = v.m; gd = v.d;
       const j = toJalaali(gy, gm, gd);
       jy = j.jy; jm = j.jm; jd = j.jd;
     } else {
       const v = readDateField("ch");
-      if (!v.y || !v.m || !v.d) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
+      if (!v.y || !v.m || !v.d || v.d < 1 || v.d > 30) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
       const jdn = hijriToJDN(v.y, v.m, v.d);
       const g = jdnToGregorian(jdn);
       gy = g.gy; gm = g.gm; gd = g.gd;
@@ -581,15 +588,19 @@ function toolDateDiff() {
       out.textContent = "هر دو روزشمار را به‌تمامی بنویسید.";
       return;
     }
-    const days = Math.abs(daysBetweenJalali(a, b));
-    let years = Math.abs(b.jy - a.jy);
-    let months = b.jm - a.jm;
-    let dd = b.jd - a.jd;
-    if (dd < 0) { months -= 1; }
+    const invalid = [a, b].some((x) => x.jm < 1 || x.jm > 12 || x.jd < 1 || x.jd > jalaaliMonthLength(x.jy, x.jm));
+    if (invalid) { out.textContent = "روزشمار نوشته‌شده پای‌مند نیست."; return; }
+    // پیش‌تر اگر روزشمار دوم پیش از نخست بود، سال و ماه نادرست درمی‌آمد؛ حالا همیشه کهن‌تر را نخست می‌گیریم.
+    const signed = daysBetweenJalali(a, b);
+    const [from, to] = signed >= 0 ? [a, b] : [b, a];
+    const days = Math.abs(signed);
+    let years = to.jy - from.jy;
+    let months = to.jm - from.jm;
+    if (to.jd < from.jd) { months -= 1; }
     if (months < 0) { months += 12; years -= 1; }
     out.innerHTML = `
       فاصله: <b>${toFaDigits(days)}</b> روز
-      <br>همتای کمابیش: <b>${toFaDigits(Math.abs(years))}</b> سال و <b>${toFaDigits(Math.abs(months))}</b> ماه`;
+      <br>همتای کمابیش: <b>${toFaDigits(years)}</b> سال و <b>${toFaDigits(months)}</b> ماه`;
   });
 }
 
@@ -627,9 +638,8 @@ function nextHolidayFrom(t) {
 function toolCountdown() {
   const t = todayJalali();
   const holiday = nextHolidayFrom(t);
-  const nowruz = t.jm === 1 && t.jd === 1
-    ? { jy: t.jy + 1, jm: 1, jd: 1 }
-    : { jy: t.jm === 1 ? t.jy : t.jy + 1, jm: 1, jd: 1 };
+  // نوروزِ پسین همیشه نخستِ فروردینِ سالِ پسین است (پیش‌تر در فروردین شمارش منفی درمی‌آمد).
+  const nowruz = { jy: t.jy + 1, jm: 1, jd: 1 };
   const daysToNowruz = daysBetweenJalali(t, nowruz);
 
   let holidayHtml = "چیزی یافت نشد.";
@@ -722,6 +732,9 @@ function toolNotes() {
     reader.onload = () => {
       try {
         const imported = JSON.parse(reader.result);
+        const okShape = imported && typeof imported === "object" && !Array.isArray(imported)
+          && Object.entries(imported).every(([k, v]) => /^\d{4}-\d{2}-\d{2}$/.test(k) && typeof v === "string");
+        if (!okShape) throw new Error("bad shape");
         const merged = { ...loadNotes(), ...imported };
         saveNotes(merged);
         document.getElementById("note-list-holder").innerHTML = renderList();
@@ -944,70 +957,54 @@ function renderWordFinderBody() {
   });
 }
 
-function normalizeFa(text) {
-  return text.replace(/ك/g, "ک").replace(/ي/g, "ی").replace(/[\u200c\u064b-\u0652]/g, "").trim();
+function normalizeFa(str) {
+  return String(str).replace(/ك/g, "ک").replace(/ي/g, "ی").replace(/\u200c/g, " ").trim();
 }
-
-const NAME_GENDER_LABEL = { m: "پسرانه", f: "دخترانه", u: "هر دو" };
 
 function toolPersianNames() {
-  openModal("نام‌های پارسی", `<p class="tool-note">در حال آماده‌سازی نام‌ها…</p>`);
-  loadPersianNames().then((names) => {
-    if (!document.getElementById("modal-overlay").classList.contains("visible")) return;
-    if (!names) {
-      document.getElementById("modal-body").innerHTML = `<p class="tool-note">بارگذاری نام‌ها شدنی نبود؛ اتصال را بررسی کنید و دوباره بکوشید.</p>`;
-      return;
-    }
-    renderPersianNamesBody(names);
-  });
-}
-
-function renderPersianNamesBody(names) {
   const html = `
-    <div class="conv-tabs" id="names-tabs">
-      <button class="conv-tab active" data-gender="all">همه</button>
-      <button class="conv-tab" data-gender="m">پسرانه</button>
-      <button class="conv-tab" data-gender="f">دخترانه</button>
+    <div class="conv-tabs">
+      <button class="conv-tab active" data-filter="all">همه</button>
+      <button class="conv-tab" data-filter="boy">پسرانه</button>
+      <button class="conv-tab" data-filter="girl">دخترانه</button>
     </div>
     <div class="field-row">
-      <input type="text" id="names-input" placeholder="نام یا معنا را بجویید">
+      <input type="text" id="names-search" placeholder="نام یا معنی را بجویید، مثلاً: آب، روشنایی، شاهنامه">
     </div>
     <div class="tool-note" id="names-count"></div>
     <ul class="name-list" id="names-list"></ul>
-    <p class="tool-note">همه‌ی نام‌ها ریشه‌ی ایرانی دارند (اوستایی، پارسی باستان، پارسی میانه یا پارسی نو). برای برخی نام‌ها پیشنهادهای ریشه‌شناختیِ گوناگونی هست و این‌جا رایج‌ترینشان آمده است. نام‌های «هر دو» برای پسر و دختر به‌کار می‌روند.</p>`;
+    <p class="tool-note">نام‌ها را با ریشه‌ی ایرانی (اوستایی، پارسی باستان، پارسی میانه، شاهنامه‌ای و پارسی نو) دست‌چین کرده‌ایم؛ نام‌های عربی و ترکی در این فهرست نیست. این فهرست کامل نیست و ریشه‌ی چند نام میان پژوهشگران گفتگوست؛ پیش از نام‌گذاری با فرهنگ‌های ریشه‌شناسی (مانند دهخدا) هم‌سنجی کنید.</p>`;
   openModal("نام‌های پارسی", html);
 
-  let gender = "all";
+  let filter = "all";
   const list = document.getElementById("names-list");
   const count = document.getElementById("names-count");
-  const input = document.getElementById("names-input");
+  const input = document.getElementById("names-search");
 
   const draw = () => {
     const q = normalizeFa(input.value);
-    const shown = names
-      .filter((e) => gender === "all" || e.g === gender || e.g === "u")
-      .filter((e) => !q || normalizeFa(e.n).includes(q) || normalizeFa(e.m).includes(q))
-      .sort((a, b) => a.n.localeCompare(b.n, "fa"));
-    count.textContent = shown.length ? `${toFaDigits(shown.length)} نام` : "";
-    if (!shown.length) {
-      list.innerHTML = `<li class="name-empty">چیزی یافت نشد.</li>`;
-      return;
-    }
-    list.innerHTML = shown.map((e) => `
-      <li>
-        <div class="name-head"><b>${escapeHtml(e.n)}</b><span class="name-tag ${e.g}">${NAME_GENDER_LABEL[e.g]}</span></div>
-        <div class="name-meaning">${escapeHtml(e.m)}</div>
-        <div class="name-root">ریشه: ${escapeHtml(e.r)}</div>
-        ${e.x ? `<div class="name-note">${escapeHtml(e.x)}</div>` : ""}
-      </li>`).join("");
-    list.scrollTop = 0;
+    const rows = PERSIAN_NAMES.filter((r) => {
+      if (filter === "boy" && r.g === "دختر") return false;
+      if (filter === "girl" && r.g === "پسر") return false;
+      if (!q) return true;
+      return normalizeFa(r.n).includes(q) || normalizeFa(r.m).includes(q) || normalizeFa(r.r).includes(q);
+    });
+    count.textContent = rows.length ? `${toFaDigits(rows.length)} نام` : "";
+    list.innerHTML = rows.length
+      ? rows.map((r) => `
+        <li class="name-item">
+          <div class="name-head"><b>${escapeHtml(r.n)}</b><span class="name-tag">${escapeHtml(r.g)}</span></div>
+          <div class="name-meaning">${escapeHtml(r.m)}</div>
+          <div class="name-root">${escapeHtml(r.r)}</div>
+        </li>`).join("")
+      : `<li class="tool-note">نامی یافت نشد.</li>`;
   };
 
-  document.querySelectorAll("#names-tabs .conv-tab").forEach((tab) => {
+  document.querySelectorAll("#modal-body .conv-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
-      document.querySelectorAll("#names-tabs .conv-tab").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll("#modal-body .conv-tab").forEach((b) => b.classList.remove("active"));
       tab.classList.add("active");
-      gender = tab.dataset.gender;
+      filter = tab.dataset.filter;
       draw();
     });
   });
@@ -1117,7 +1114,6 @@ function toolSettings() {
         <li>تبدیل گاهشماری: <a href="https://github.com/jalaali/jalaali-js" target="_blank" rel="noopener">jalaali-js</a> (MIT)</li>
         <li>داده‌ی رخدادها: بستهٔ آزاد <a href="https://github.com/openscilab/rokh" target="_blank" rel="noopener">rokh</a></li>
         <li>واژه‌یاب سره: پایگاه‌داده‌ی <a href="https://github.com/keyaruga33/pasban_db" target="_blank" rel="noopener">پاسبان</a> (Pasban)</li>
-        <li>نام‌های پارسی: فهرستی گزیده با ریشه‌ی ایرانی، گردآوری‌شده برای همین پروژه</li>
         <li>فونت: <a href="https://github.com/rastikerdar/vazirmatn" target="_blank" rel="noopener">وزیرمتن</a> (SIL OFL)</li>
       </ul>
       <p class="tool-note">نگارش ${SARE_VERSION}</p>

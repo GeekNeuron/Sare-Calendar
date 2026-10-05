@@ -500,19 +500,6 @@ html.dark .menu-overlay, html.dark .modal-overlay { background: rgba(0, 0, 0, 0.
   transition: background 0.35s ease;
 }
 .glossary-list b { color: var(--teal-deep); }
-.name-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
-.name-list li { padding: 9px 12px; background: var(--ivory); border-radius: 8px; font-size: 0.85rem; line-height: 1.7; transition: background 0.35s ease; }
-.name-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.name-head b { font-size: 1rem; color: var(--teal-deep); }
-.name-tag { font-size: 0.68rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--muted); flex: none; }
-.name-tag.m { color: var(--teal-deep); border-color: var(--teal); }
-.name-tag.f { color: var(--terracotta); border-color: var(--terracotta); }
-.name-tag.u { color: var(--gold); border-color: var(--gold); }
-.name-meaning { color: var(--ink); }
-.name-root { font-size: 0.76rem; color: var(--muted); }
-.name-note { font-size: 0.78rem; color: var(--ink); opacity: 0.85; margin-top: 2px; }
-.name-empty { color: var(--muted); }
-
 .tool-section h3 { margin: 0 0 10px; font-size: 0.95rem; color: var(--teal-deep); }
 
 .field-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
@@ -764,3 +751,12 @@ html.font-lg { font-size: 18px; }
   .cell { min-height: 48px; }
   .day-name-fa { display: none; }
 }
+
+/* ابزار «نام‌های پارسی» */
+.name-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 380px; overflow-y: auto; }
+.name-item { padding: 9px 12px; background: var(--ivory); border-radius: 8px; font-size: 0.82rem; transition: background 0.35s ease; }
+.name-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.name-head b { color: var(--teal-deep); font-size: 0.95rem; }
+.name-tag { font-size: 0.68rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+.name-meaning { color: var(--ink); }
+.name-root { color: var(--muted); font-size: 0.74rem; margin-top: 2px; line-height: 1.7; }
