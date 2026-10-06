@@ -1,0 +1,1357 @@
+{
+ "آذر": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "آرش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آرمان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آریا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آریان": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آزاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آبان": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "اردشیر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ارژنگ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "اسفندیار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "اشکان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "امید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "انوشیروان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "اهورا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ایرج": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ایران": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بابک": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بردیا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "برزو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بهار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بهرام": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بهروز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بهزاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بهمن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بهنام": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بیژن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "پارسا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "پرویز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "پویا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "پیروز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پیمان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "جمشید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "جهانگیر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "خسرو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "خشایار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "خورشید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "دارا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "داریوش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "دلاور": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "رامین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "روزبه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "زال": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "زرتشت": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ساسان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سپهر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سپنتا": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "سروش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سهراب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سیاوش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "شاپور": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شاهرخ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شاهین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "شهریار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شیرزاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرخ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرزاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرشاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فریدون": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کاوه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "کامران": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "کامیار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "کیان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "کیخسرو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "کیقباد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "کیهان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کوروش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "گرشاسب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهرداد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مهران": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نریمان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "نوید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هامون": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "هرمز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "هوشنگ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "هومن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هیربد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "یاور": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "یزدان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آتوسا": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "آذین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آرام": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آرزو": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آرمیتا": {
+  "sources": 2,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "آریانا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آزاده": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آسمان": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آفرین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آناهید": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "آناهیتا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آوا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ارغوان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ارمغان": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "افسانه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "افسون": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "اندیشه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "باران": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بانو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بهاره": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بهدخت": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بهناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بهنوش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "بیتا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پرستو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پروانه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پروین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پری": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پریسا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "پریناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پگاه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "تابان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "تارا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ترانه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "جهان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "دریا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "دلارام": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "دنا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "دیبا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "رخشان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "رها": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "رودابه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "روژین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "روشنک": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "زرین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "زیبا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ژاله": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سایه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سپیده": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ستاره": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سروناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سرو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سمن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سیمین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شادی": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "شبنم": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شهرزاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "شهناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شیرین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "فرانک": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "فرزانه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فروزان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فروغ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فریبا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "گلاب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "گلنار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "گلشن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "گیسو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "لاله": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مروارید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مژگان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مهتاب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهرانگیز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهربانو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهرناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهرنوش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مهسا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مهشید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ماه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ماهک": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ماهرخ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مینا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مینو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ناهید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نازگل": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "نازنین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "نسترن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "نگار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نگارین": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نگین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نوشین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نوشا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نیکی": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هستی": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هما": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "یسنا": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "none"
+ },
+ "یگانه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آبتین": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آرین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ارجمند": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "افراسیاب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "افشین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "انوش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "اورنگ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "باربد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بزرگمهر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بهمنیار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "تهماسب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "تهمورث": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "تورج": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "توس": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "زواره": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سام": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سورنا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شادمان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شادمهر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "شایگان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "سالار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "دماوند": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "دادگر": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "دانا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "دانش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "رادمنش": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "رادمهر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "رستم": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "روناک": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فربد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرزان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرشید": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرهاد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "فرهنگ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "فیروز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "قباد": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "لهراسب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مازیار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "منوچهر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "مهیار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "نوذر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نیک": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هوتن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هوشمند": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هوشیار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "هومان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "پدرام": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پایا": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پندار": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کاووس": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کیا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کیومرث": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "گشتاسب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "گودرز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کوشا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "آذرمیدخت": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آفتاب": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "آهو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ایراندخت": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "بنفشه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پرنیان": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پرند": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پردیس": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پونه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "چیستا": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "خرداد": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "دردانه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "ستایش": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "سودابه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "شباهنگ": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شکوفه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شکوه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شهرناز": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "شهربانو": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ماندانا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "منیژه": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نارون": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نیلوفر": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "نهال": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "نیوشا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "همایون": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "ویس": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "گردآفرید": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "کتایون": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "گیتی": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "یاسمن": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "یکتا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرنگیس": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "فرشته": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهین": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "مهستی": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "review"
+ },
+ "میترا": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پارمیس": {
+  "sources": 3,
+  "gender_ok": true,
+  "meaning": "agree"
+ },
+ "پوراندخت": {
+  "sources": 4,
+  "gender_ok": true,
+  "meaning": "agree"
+ }
+}

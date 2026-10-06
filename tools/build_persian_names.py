@@ -12,7 +12,13 @@ SRC = os.path.join(HERE, "persian-names.tsv")
 OUT = os.path.join(HERE, "..", "assets", "persian-names.js")
 
 
+VERIFY = os.path.join(HERE, "persian-names-verification.json")
+
+
 def main():
+    verification = {}
+    if os.path.exists(VERIFY):
+        verification = json.load(open(VERIFY, encoding="utf-8"))
     rows = []
     seen = set()
     with open(SRC, encoding="utf-8") as f:
@@ -24,7 +30,10 @@ def main():
             assert group in ("پسر", "دختر", "هر دو"), (name, group)
             assert name not in seen, f"تکراری: {name}"
             seen.add(name)
-            rows.append({"n": name, "g": group, "m": meaning, "r": root})
+            row = {"n": name, "g": group, "m": meaning, "r": root}
+            if name in verification:
+                row["v"] = verification[name]["sources"]
+            rows.append(row)
     rows.sort(key=lambda r: r["n"])
     with open(OUT, "w", encoding="utf-8") as f:
         f.write("window.SARE_PERSIAN_NAMES = ")

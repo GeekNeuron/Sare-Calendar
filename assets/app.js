@@ -38,7 +38,6 @@ const JASHN_DAYS = {
   "10-15": "جشن دی‌گان (دی‌به‌مهر)",
   "10-23": "جشن دی‌گان (دی‌به‌دین)",
   "11-2": "جشن بهمن‌گان",
-  "12-5": "جشن اسپندگان",
 };
 
 const ANIMALS_FA = ["موش", "گاو", "پلنگ", "خرگوش", "نهنگ", "مار", "اسب", "گوسفند", "میمون", "مرغ", "سگ", "خوک"];
@@ -56,6 +55,7 @@ const EVENT_CONTEXT = window.SARE_EVENT_CONTEXT || {};
 const EVENTS_NATURAL = window.SARE_EVENTS_NATURAL || {};
 const NATURAL_CONTEXT = window.SARE_NATURAL_CONTEXT || {};
 const PERSIAN_NAMES = window.SARE_PERSIAN_NAMES || [];
+const EVENTS_GLOBAL = window.SARE_EVENTS_GLOBAL || {};
 
 // توضیحِ پاپ‌آپِ یک رخداد؛ رخدادهای طبیعیِ نجومی «نوشته · ساعت …» هستند و کلیدشان بخشِ پیش از « · » است.
 function contextFor(e) {
@@ -77,6 +77,8 @@ function loadPasbanWords() {
 
 const REGIONAL_KEY = "sareRegionalEvents";
 const regionalEnabled = () => localStorage.getItem(REGIONAL_KEY) === "on";
+const GLOBAL_KEY = "sareGlobalEvents";
+const globalEnabled = () => localStorage.getItem(GLOBAL_KEY) === "on";
 
 function pad2(n) { return String(n).padStart(2, "0"); }
 
@@ -86,6 +88,11 @@ function dayInfo(jy, jm, jd) {
   let events = base.events;
   if (EVENTS_NATURAL[key]) events = [...events, ...EVENTS_NATURAL[key]];
   if (regionalEnabled() && EVENTS_REGIONAL[key]) events = [...events, ...EVENTS_REGIONAL[key]];
+  if (globalEnabled()) {
+    const g = toGregorian(jy, jm, jd);
+    const gl = EVENTS_GLOBAL[`${pad2(g.gm)}-${pad2(g.gd)}`];
+    if (gl) events = [...events, ...gl];
+  }
   return events === base.events ? base : { events, is_holiday: base.is_holiday };
 }
 
@@ -232,6 +239,9 @@ function buildMonthGrid(jy, jm) {
   return weeks;
 }
 
+// نمایشِ رخداد با رقم‌های پارسی (داده دست‌نخورده می‌ماند تا کلیدِ توضیح‌ها و جست‌وجو برجا بماند)
+const faText = (s) => String(s).replace(/[0-9]/g, (d) => FA_DIGITS[d]);
+
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -280,9 +290,9 @@ function renderDayDetail(jy, jm, jd) {
     ? `<ul class="detail-event-list">${events.map((e) => {
         const ctx = contextFor(e);
         if (ctx) {
-          return `<li class="expandable"><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span><span class="ev-arrow">›</span></span></li>`;
+          return `<li class="expandable"><span class="ev-row"><span class="ev-text">${escapeHtml(faText(e))}</span><span class="ev-arrow">›</span></span></li>`;
         }
-        return `<li><span class="ev-row"><span class="ev-text">${escapeHtml(e)}</span></span></li>`;
+        return `<li><span class="ev-row"><span class="ev-text">${escapeHtml(faText(e))}</span></span></li>`;
       }).join("")}</ul>`
     : `<p class="detail-empty">رخدادی برای این روز ثبت نشده.</p>`;
   const noteHtml = note ? `<p class="detail-note"><b>یادداشت شما:</b> ${escapeHtml(note)}</p>` : "";
@@ -300,7 +310,7 @@ function renderDayDetail(jy, jm, jd) {
   holder.querySelectorAll(".detail-event-list li.expandable").forEach((li, i) => {
     const eventText = withContext[i];
     li.addEventListener("click", () => {
-      openModal(eventText.split(" · ")[0], `<p class="popup-text">${escapeHtml(contextFor(eventText))}</p>${eventText.includes(" · ") ? `<p class="tool-note">${escapeHtml(eventText.split(" · ").slice(1).join(" · "))}</p>` : ""}`);
+      openModal(faText(eventText.split(" · ")[0]), `<p class="popup-text">${escapeHtml(contextFor(eventText))}</p>${eventText.includes(" · ") ? `<p class="tool-note">${escapeHtml(eventText.split(" · ").slice(1).join(" · "))}</p>` : ""}`);
     });
   });
   void holder.offsetWidth;
@@ -973,7 +983,7 @@ function toolPersianNames() {
     </div>
     <div class="tool-note" id="names-count"></div>
     <ul class="name-list" id="names-list"></ul>
-    <p class="tool-note">نام‌ها را با ریشه‌ی ایرانی (اوستایی، پارسی باستان، پارسی میانه، شاهنامه‌ای و پارسی نو) دست‌چین کرده‌ایم؛ نام‌های عربی و ترکی در این فهرست نیست. این فهرست کامل نیست و ریشه‌ی چند نام میان پژوهشگران گفتگوست؛ پیش از نام‌گذاری با فرهنگ‌های ریشه‌شناسی (مانند دهخدا) هم‌سنجی کنید.</p>`;
+    <p class="tool-note">نام‌ها را با ریشه‌ی ایرانی (اوستایی، پارسی باستان، پارسی میانه، شاهنامه‌ای و پارسی نو) دست‌چین کرده‌ایم و بودنشان را با چهار فهرستِ بازِ نام‌های ایرانی سنجیده‌ایم (شمارِ فهرست‌ها کنار هر نام است). فهرست کامل نیست و ریشه‌ی چند نام میان پژوهشگران گفتگوست؛ پیش از نام‌گذاری با فرهنگ‌های ریشه‌شناسی (مانند دهخدا) هم‌سنجی کنید.</p>`;
   openModal("نام‌های پارسی", html);
 
   let filter = "all";
@@ -993,7 +1003,7 @@ function toolPersianNames() {
     list.innerHTML = rows.length
       ? rows.map((r) => `
         <li class="name-item">
-          <div class="name-head"><b>${escapeHtml(r.n)}</b><span class="name-tag">${escapeHtml(r.g)}</span></div>
+          <div class="name-head"><b>${escapeHtml(r.n)}</b><span class="name-tag">${escapeHtml(r.g)}</span>${r.v ? `<span class="name-tag name-verified" title="نام در این شمار از چهار فهرستِ بازِ نام‌های ایرانی دیده شد">${toFaDigits(r.v)} از ۴ فهرست</span>` : ""}</div>
           <div class="name-meaning">${escapeHtml(r.m)}</div>
           <div class="name-root">${escapeHtml(r.r)}</div>
         </li>`).join("")
@@ -1055,7 +1065,7 @@ function toolEventSearch() {
     holder.innerHTML = `<ul class="search-result-list">${results.map((r) =>
       `<li class="search-result-item" data-m="${r.jm}" data-d="${r.jd}">
         <span class="sr-date">${toFaDigits(r.jd)} ${MONTHS_FA[r.jm - 1]}</span>
-        <span class="sr-text">${escapeHtml(r.text)}</span>
+        <span class="sr-text">${escapeHtml(faText(r.text))}</span>
       </li>`
     ).join("")}</ul>`;
     holder.querySelectorAll(".search-result-item").forEach((li) => {
@@ -1104,6 +1114,15 @@ function toolSettings() {
       </div>
     </div>
     <div class="tool-section">
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">رخدادها و روزهای جهانی</div>
+          <div class="tool-note" style="margin-top:2px">روزهای جهانیِ سازمان ملل و رخدادهای جهانیِ همان روزِ میلادی را هم نشان بده.</div>
+        </div>
+        <button class="toggle-switch ${globalEnabled() ? "on" : ""}" id="global-toggle" role="switch" aria-checked="${globalEnabled()}"><span class="toggle-knob"></span></button>
+      </div>
+    </div>
+    <div class="tool-section">
       <h3>یادداشت‌ها</h3>
       <button class="tool-btn danger" id="clear-notes-btn">پاک‌کردن همه‌ی یادداشت‌ها</button>
     </div>
@@ -1142,6 +1161,16 @@ function toolSettings() {
     btn.classList.toggle("on", next);
     btn.setAttribute("aria-checked", String(next));
     localStorage.setItem(REGIONAL_KEY, next ? "on" : "off");
+    const cur = document.querySelector("main");
+    render(Number(cur.dataset.jy), Number(cur.dataset.jm));
+  });
+
+  document.getElementById("global-toggle").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const next = !btn.classList.contains("on");
+    btn.classList.toggle("on", next);
+    btn.setAttribute("aria-checked", String(next));
+    localStorage.setItem(GLOBAL_KEY, next ? "on" : "off");
     const cur = document.querySelector("main");
     render(Number(cur.dataset.jy), Number(cur.dataset.jm));
   });
