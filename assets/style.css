@@ -761,3 +761,4 @@ html.font-lg { font-size: 18px; }
 .name-meaning { color: var(--ink); }
 .name-root { color: var(--muted); font-size: 0.74rem; margin-top: 2px; line-height: 1.7; }
 .name-verified { color: var(--teal); border-color: var(--teal); }
+@media (max-width: 640px) { .seg-extra { display: none; } }

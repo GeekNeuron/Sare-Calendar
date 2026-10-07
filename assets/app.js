@@ -1096,7 +1096,7 @@ function toolSettings() {
       <div class="seg-control" id="theme-seg">
         <button class="seg-btn ${curTheme === "light" ? "active" : ""}" data-value="light">روشن</button>
         <button class="seg-btn ${curTheme === "dark" ? "active" : ""}" data-value="dark">تاریک</button>
-        <button class="seg-btn ${curTheme === "auto" ? "active" : ""}" data-value="auto">خودکار (پیرو سیستم)</button>
+        <button class="seg-btn ${curTheme === "auto" ? "active" : ""}" data-value="auto">خودکار<span class="seg-extra"> (پیرو سیستم)</span></button>
       </div>
     </div>
     <div class="tool-section">
