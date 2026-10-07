@@ -1,7 +1,7 @@
 """رخدادهای گاهشمار را از بسته‌ی `rokh` می‌سازد.
 
 سه خروجی:
-  assets/events-data.js      رخدادهای اصلیِ هر روز ۱۴۰۰ تا ۱۴۳۰ (جلالی) + رنگِ فرویش
+  assets/events-data.js      رخدادهای اصلیِ هر روز ۱۴۰۰ تا ۱۴۳۰ (جلالی) + رنگِ فرویش (h=true: فرویشِ قمری)
   assets/events-regional.js  لایه‌ی اختیاریِ روزهای شهرها و استان‌ها
   assets/events-global.js    لایه‌ی اختیاریِ رخدادها و روزهای جهانی (کلید: «ماه-روز» میلادی)
 
@@ -156,11 +156,13 @@ def main():
                     if text not in events:
                         events.append(text)
                 # رنگِ فرویش: از رخدادهای نگه‌داشته‌شده یا از تقویم قمری
-                is_holiday = any(e["is_holiday"] for e in kept) or any(
-                    e["is_holiday"] for e in info["events"]["hijri"]
-                )
+                civil = any(e["is_holiday"] for e in kept)
+                lunar = any(e["is_holiday"] for e in info["events"]["hijri"])
+                is_holiday = civil or lunar
                 if events or is_holiday:
                     data[key] = {"events": events, "is_holiday": is_holiday}
+                    if lunar and not civil:
+                        data[key]["h"] = True  # فرویشِ برخاسته تنها از تقویم قمری؛ در تنظیمات خاموش‌شدنی
                 if reg:
                     regional[key] = reg
     write_js(OUT_PATH, "SARE_EVENTS", data)

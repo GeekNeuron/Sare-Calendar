@@ -77,6 +77,8 @@ function loadPasbanWords() {
 
 const REGIONAL_KEY = "sareRegionalEvents";
 const regionalEnabled = () => localStorage.getItem(REGIONAL_KEY) === "on";
+const LUNAR_HOLIDAY_KEY = "sareLunarHolidays";
+const lunarHolidaysEnabled = () => localStorage.getItem(LUNAR_HOLIDAY_KEY) !== "off";
 const GLOBAL_KEY = "sareGlobalEvents";
 const globalEnabled = () => localStorage.getItem(GLOBAL_KEY) === "on";
 
@@ -93,7 +95,8 @@ function dayInfo(jy, jm, jd) {
     const gl = EVENTS_GLOBAL[`${pad2(g.gm)}-${pad2(g.gd)}`];
     if (gl) events = [...events, ...gl];
   }
-  return events === base.events ? base : { events, is_holiday: base.is_holiday };
+  const holiday = base.is_holiday && (!base.h || lunarHolidaysEnabled());
+  return events === base.events && holiday === base.is_holiday ? base : { events, is_holiday: holiday };
 }
 
 // ماه‌های ۳۱روزه روزِ سی‌ویکم را بی‌نام دارند؛ پیش‌تر به‌اشتباه «هرمزد» نشان داده می‌شد.
@@ -225,7 +228,7 @@ function buildMonthGrid(jy, jm) {
       day: d,
       dayFa: toFaDigits(d),
       dayNameFa: dayNameFor(d),
-      gregorianLabel: `${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]}`,
+      gregorianLabel: `${toFaDigits(pad2(g.gd))} ${GREG_MONTHS_FA[g.gm - 1]}`,
       isToday: today.jy === jy && today.jm === jm && today.jd === d,
       isHoliday: !!info.is_holiday,
       hasNote: !!notes[key],
@@ -302,7 +305,7 @@ function renderDayDetail(jy, jm, jd) {
   holder.innerHTML = `
     <div class="detail-header">
       <span class="detail-date">${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</span>
-      <span class="detail-sub">${dayName === "—" ? "" : dayName + " · "}${pad2(g.gd)} ${GREG_MONTHS_FA[g.gm - 1]} ${g.gy} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · فرویش" : ""}</span>
+      <span class="detail-sub">${dayName === "—" ? "" : dayName + " · "}${toFaDigits(pad2(g.gd))} ${GREG_MONTHS_FA[g.gm - 1]} ${toFaDigits(g.gy)} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · فرویش" : ""}</span>
     </div>
     ${eventsHtml}
     ${noteHtml}`;
@@ -572,7 +575,7 @@ function toolDateConverter() {
     out.innerHTML = `
       <div class="conv-result-grid">
         <div class="conv-result-row"><span>جلالی</span><b>${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</b></div>
-        <div class="conv-result-row"><span>ترسایی</span><b>${gd} ${GREG_MONTHS_FA[gm - 1]} ${gy}</b></div>
+        <div class="conv-result-row"><span>ترسایی</span><b>${toFaDigits(gd)} ${GREG_MONTHS_FA[gm - 1]} ${toFaDigits(gy)}</b></div>
         <div class="conv-result-row"><span>مهی</span><b>${toFaDigits(hd)} ${HIJRI_MONTHS_FA[hm - 1]} ${toFaDigits(hy)}</b></div>
       </div>`;
   });
@@ -1116,6 +1119,15 @@ function toolSettings() {
     <div class="tool-section">
       <div class="toggle-row">
         <div>
+          <div class="toggle-label">رنگِ فرویشِ قمری</div>
+          <div class="tool-note" style="margin-top:2px">روزهای فرویشی که تنها از تقویم قمری می‌آیند (عید فطر، عاشورا و …) را هم قرمز نشان بده.</div>
+        </div>
+        <button class="toggle-switch ${lunarHolidaysEnabled() ? "on" : ""}" id="lunar-toggle" role="switch" aria-checked="${lunarHolidaysEnabled()}"><span class="toggle-knob"></span></button>
+      </div>
+    </div>
+    <div class="tool-section">
+      <div class="toggle-row">
+        <div>
           <div class="toggle-label">رخدادها و روزهای جهانی</div>
           <div class="tool-note" style="margin-top:2px">روزهای جهانیِ سازمان ملل و رخدادهای جهانیِ همان روزِ میلادی را هم نشان بده.</div>
         </div>
@@ -1161,6 +1173,16 @@ function toolSettings() {
     btn.classList.toggle("on", next);
     btn.setAttribute("aria-checked", String(next));
     localStorage.setItem(REGIONAL_KEY, next ? "on" : "off");
+    const cur = document.querySelector("main");
+    render(Number(cur.dataset.jy), Number(cur.dataset.jm));
+  });
+
+  document.getElementById("lunar-toggle").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const next = !btn.classList.contains("on");
+    btn.classList.toggle("on", next);
+    btn.setAttribute("aria-checked", String(next));
+    localStorage.setItem(LUNAR_HOLIDAY_KEY, next ? "on" : "off");
     const cur = document.querySelector("main");
     render(Number(cur.dataset.jy), Number(cur.dataset.jm));
   });
