@@ -1119,8 +1119,8 @@ function toolSettings() {
     <div class="tool-section">
       <div class="toggle-row">
         <div>
-          <div class="toggle-label">رنگِ فرویشِ قمری</div>
-          <div class="tool-note" style="margin-top:2px">روزهای فرویشی که تنها از تقویم قمری می‌آیند (عید فطر، عاشورا و …) را هم قرمز نشان بده.</div>
+          <div class="toggle-label">رنگِ فرویش‌های بی‌نام</div>
+          <div class="tool-note" style="margin-top:2px">روزهای فرویشِ رسمی که در این گاهشمار نامی ندارند (برآمده از تقویم قمری یا از مناسبت‌های کنارگذاشته) را هم قرمز نشان بده.</div>
         </div>
         <button class="toggle-switch ${lunarHolidaysEnabled() ? "on" : ""}" id="lunar-toggle" role="switch" aria-checked="${lunarHolidaysEnabled()}"><span class="toggle-knob"></span></button>
       </div>
@@ -1227,9 +1227,14 @@ const TOOLS = {
   "share-today": { label: "هم‌رسانیِ امروز", run: toolShareToday },
   "event-search": { label: "جست‌وجوی رخداد", run: toolEventSearch },
   "word-finder": { label: "واژه‌یاب سره", run: toolWordFinder },
-  "persian-names": { label: "نام‌های پارسی", run: toolPersianNames },
   "settings": { label: "تنظیمات", run: toolSettings },
 };
+
+// ابزار «نام‌های پارسی» موقتاً خاموش است (کد و داده برجا هستند). برای روشن‌کردن: true.
+const NAMES_TOOL_ENABLED = false;
+if (NAMES_TOOL_ENABLED) {
+  TOOLS["persian-names"] = { label: "نام‌های پارسی", run: toolPersianNames };
+}
 
 function buildSideMenu() {
   const list = document.getElementById("tool-list");
