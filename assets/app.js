@@ -54,6 +54,7 @@ const PROVERBS = window.SARE_PROVERBS || [];
 const EVENT_CONTEXT = window.SARE_EVENT_CONTEXT || {};
 const EVENTS_NATURAL = window.SARE_EVENTS_NATURAL || {};
 const NATURAL_CONTEXT = window.SARE_NATURAL_CONTEXT || {};
+const CTX_UNVERIFIED = window.SARE_EVENT_CONTEXT_UNVERIFIED || {};
 const PERSIAN_NAMES = window.SARE_PERSIAN_NAMES || [];
 const EVENTS_GLOBAL = window.SARE_EVENTS_GLOBAL || {};
 
@@ -313,7 +314,7 @@ function renderDayDetail(jy, jm, jd) {
   holder.querySelectorAll(".detail-event-list li.expandable").forEach((li, i) => {
     const eventText = withContext[i];
     li.addEventListener("click", () => {
-      openModal(faText(eventText.split(" · ")[0]), `<p class="popup-text">${escapeHtml(contextFor(eventText))}</p>${eventText.includes(" · ") ? `<p class="tool-note">${escapeHtml(eventText.split(" · ").slice(1).join(" · "))}</p>` : ""}`);
+      openModal(faText(eventText.split(" · ")[0]), `<p class="popup-text">${escapeHtml(contextFor(eventText))}</p>${CTX_UNVERIFIED[eventText] ? `<p class="tool-note">این توضیح هنوز با منبعِ بیرونی سنجیده نشده است.</p>` : ""}${eventText.includes(" · ") ? `<p class="tool-note">${escapeHtml(eventText.split(" · ").slice(1).join(" · "))}</p>` : ""}`);
     });
   });
   void holder.offsetWidth;
