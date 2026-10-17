@@ -97,7 +97,7 @@ function dayInfo(jy, jm, jd) {
     if (gl) events = [...events, ...gl];
   }
   const holiday = base.is_holiday && (!base.h || lunarHolidaysEnabled());
-  return events === base.events && holiday === base.is_holiday ? base : { events, is_holiday: holiday };
+  return events === base.events && holiday === base.is_holiday ? base : { events, is_holiday: holiday, h: base.h };
 }
 
 // ماه‌های ۳۱روزه روزِ سی‌ویکم را بی‌نام دارند؛ پیش‌تر به‌اشتباه «هرمزد» نشان داده می‌شد.
@@ -298,7 +298,9 @@ function renderDayDetail(jy, jm, jd) {
         }
         return `<li><span class="ev-row"><span class="ev-text">${escapeHtml(faText(e))}</span></span></li>`;
       }).join("")}</ul>`
-    : `<p class="detail-empty">رخدادی برای این روز ثبت نشده.</p>`;
+    : (info.is_holiday
+      ? `<p class="detail-empty">این روز ${holidayLabel(info.h)} است؛ رخدادی برای آن در این گاهشمار ثبت نشده.</p>`
+      : `<p class="detail-empty">رخدادی برای این روز ثبت نشده.</p>`);
   const noteHtml = note ? `<p class="detail-note"><b>یادداشت شما:</b> ${escapeHtml(note)}</p>` : "";
 
   const holder = document.getElementById("day-detail");
@@ -306,7 +308,7 @@ function renderDayDetail(jy, jm, jd) {
   holder.innerHTML = `
     <div class="detail-header">
       <span class="detail-date">${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</span>
-      <span class="detail-sub">${dayName === "—" ? "" : dayName + " · "}${toFaDigits(pad2(g.gd))} ${GREG_MONTHS_FA[g.gm - 1]} ${toFaDigits(g.gy)} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · فرویش" : ""}</span>
+      <span class="detail-sub">${dayName === "—" ? "" : dayName + " · "}${toFaDigits(pad2(g.gd))} ${GREG_MONTHS_FA[g.gm - 1]} ${toFaDigits(g.gy)} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · " + (events.length ? "فرویش" : holidayLabel(info.h)) : ""}</span>
     </div>
     ${eventsHtml}
     ${noteHtml}`;
@@ -638,13 +640,18 @@ function toolYearAnimal() {
   });
 }
 
+// برچسبِ فرویشی که رخدادش در این گاهشمار نیست: «m» مذهبی (قمری)، «c» رسمیِ غیرمذهبی
+function holidayLabel(h) {
+  return h === "m" ? "تعطیلی مذهبی" : "تعطیل رسمی";
+}
+
 function nextHolidayFrom(t) {
   let jy = t.jy, jm = t.jm, jd = t.jd;
   for (let i = 0; i < 400; i += 1) {
     const advanced = addDaysToJalali(jy, jm, jd, 1);
     jy = advanced.jy; jm = advanced.jm; jd = advanced.jd;
     const info = dayInfo(jy, jm, jd);
-    if (info.is_holiday) return { jy, jm, jd, events: info.events };
+    if (info.is_holiday) return { jy, jm, jd, events: info.events, h: info.h };
   }
   return null;
 }
@@ -659,7 +666,7 @@ function toolCountdown() {
   let holidayHtml = "چیزی یافت نشد.";
   if (holiday) {
     const days = daysBetweenJalali(t, holiday);
-    const label = holiday.events && holiday.events.length ? holiday.events.join("، ") : "فرویش";
+    const label = holiday.events && holiday.events.length ? holiday.events.join("، ") : holidayLabel(holiday.h);
     holidayHtml = `<b>${toFaDigits(days)}</b> روز تا ${escapeHtml(label)}
       (${toFaDigits(holiday.jd)} ${MONTHS_FA[holiday.jm - 1]} ${toFaDigits(holiday.jy)})`;
   }
@@ -1121,7 +1128,7 @@ function toolSettings() {
       <div class="toggle-row">
         <div>
           <div class="toggle-label">رنگِ فرویش‌های بی‌نام</div>
-          <div class="tool-note" style="margin-top:2px">روزهای فرویشِ رسمی که در این گاهشمار نامی ندارند (برآمده از تقویم قمری یا از مناسبت‌های کنارگذاشته) را هم قرمز نشان بده.</div>
+          <div class="tool-note" style="margin-top:2px">روزهای فرویشِ رسمی که رخدادشان در این گاهشمار نیست (تعطیلی مذهبی یا تعطیل رسمی) را هم قرمز نشان بده.</div>
         </div>
         <button class="toggle-switch ${lunarHolidaysEnabled() ? "on" : ""}" id="lunar-toggle" role="switch" aria-checked="${lunarHolidaysEnabled()}"><span class="toggle-knob"></span></button>
       </div>
