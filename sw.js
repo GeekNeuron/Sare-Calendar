@@ -1,4 +1,4 @@
-const CACHE_NAME = "sare-calendar-v3";
+const CACHE_NAME = "sare-calendar-v4";
 // واژه‌نامه‌ی ~۱ مگابایتیِ پاسبان (pasban-words.json) پیشاپیش ذخیره نمی‌شود؛
 // با نخستین استفاده در حافظه‌ی نهان می‌نشیند.
 const ASSETS = [
@@ -10,6 +10,7 @@ const ASSETS = [
   "./assets/events-regional.js",
   "./assets/events-natural.js",
   "./assets/events-global.js",
+  "./assets/awareness-data.js",
   "./assets/event-context.js",
   "./assets/history-facts.js",
   "./assets/proverbs.js",

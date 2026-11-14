@@ -105,8 +105,55 @@ function dayNameFor(d) {
   return d > 30 ? "—" : ZOROASTRIAN_DAY_NAMES[d - 1];
 }
 
+// گاهشمارِ بستانی (فصلیِ) زرتشتیان ایران: ۱۲ ماهِ ۳۰روزه + ۵ روز گات. در گاهشمار رسمی شش ماه نخست ۳۱ روزند؛
+// پس از ماه هفتم، هر روزِ بستانی شش روز زودتر از همتای «نام‌روز»ش در گاهشمار رسمی می‌افتد.
+const CIVIL_LENGTHS = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+function bastaniToCivil(m, d) {
+  let off = 30 * (m - 1) + (d - 1);
+  for (let i = 0; i < 12; i += 1) {
+    if (off < CIVIL_LENGTHS[i]) return { jm: i + 1, jd: off + 1 };
+    off -= CIVIL_LENGTHS[i];
+  }
+  return null;
+}
+function civilToBastani(jy, jm, jd) {
+  let off = 0;
+  for (let i = 1; i < jm; i += 1) off += jalaaliMonthLength(jy, i);
+  off += jd - 1;
+  if (off >= 360) return { gatha: off - 359 };
+  return { m: Math.floor(off / 30) + 1, d: (off % 30) + 1 };
+}
+// جشن‌های ماهانه: ماه و روزهای «نام‌روز» (روز و ماه هم‌نام)
+const MONTH_FESTIVALS = [
+  { n: "فروردین‌گان", m: 1, days: [19] },
+  { n: "اردیبهشت‌گان", m: 2, days: [3] },
+  { n: "خردادگان", m: 3, days: [6] },
+  { n: "تیرگان", m: 4, days: [13] },
+  { n: "مردادگان", m: 5, days: [7] },
+  { n: "شهریورگان", m: 6, days: [4] },
+  { n: "مهرگان", m: 7, days: [16] },
+  { n: "آبانگان", m: 8, days: [10] },
+  { n: "آذرگان", m: 9, days: [9] },
+  { n: "دی‌گان", m: 10, days: [8, 15, 23] },
+  { n: "بهمن‌گان", m: 11, days: [2] },
+  { n: "اسفندگان", m: 12, days: [5], skipObserved: true },
+];
+// تاریخ برگزاریِ زرتشتیان ایران در گاهشمار رسمی (برای روزهایی که با نام‌روز فرق دارد)
+const JASHN_OBSERVED = {};
+MONTH_FESTIVALS.forEach((f) => {
+  if (f.skipObserved) return;
+  f.days.forEach((d) => {
+    const c = bastaniToCivil(f.m, d);
+    if (!c) return;
+    const key = `${c.jm}-${c.jd}`;
+    if (JASHN_DAYS[key] || JASHN_OBSERVED[key]) return;
+    JASHN_OBSERVED[key] = `جشن ${f.n} (روزِ برگزاریِ زرتشتیان ایران)`;
+  });
+});
+
 function jashnFor(jm, jd) {
-  return JASHN_DAYS[`${jm}-${jd}`] || null;
+  const k = `${jm}-${jd}`;
+  return JASHN_DAYS[k] || JASHN_OBSERVED[k] || null;
 }
 
 function yearAnimal(jy) {
@@ -309,6 +356,12 @@ function renderDayDetail(jy, jm, jd) {
     <div class="detail-header">
       <span class="detail-date">${toFaDigits(jd)} ${MONTHS_FA[jm - 1]} ${toFaDigits(jy)}</span>
       <span class="detail-sub">${dayName === "—" ? "" : dayName + " · "}${toFaDigits(pad2(g.gd))} ${GREG_MONTHS_FA[g.gm - 1]} ${toFaDigits(g.gy)} · ${toFaDigits(h.hd)} ${HIJRI_MONTHS_FA[h.hm - 1]} ${toFaDigits(h.hy)}${info.is_holiday ? " · " + (events.length ? "فرویش" : holidayLabel(info.h)) : ""}</span>
+      <span class="detail-bastani">${(() => {
+        const bs = civilToBastani(jy, jm, jd);
+        return bs.gatha
+          ? `بستانی (زرتشتیان ایران): روز گات ${toFaDigits(bs.gatha)}`
+          : `بستانی (زرتشتیان ایران): ${ZOROASTRIAN_DAY_NAMES[bs.d - 1]}\u200cروز · ${toFaDigits(bs.d)} ${MONTHS_FA[bs.m - 1]}`;
+      })()}</span>
     </div>
     ${eventsHtml}
     ${noteHtml}`;
@@ -1225,6 +1278,77 @@ function toolSettings() {
   });
 }
 
+
+// «آگاهی‌نامه»: سه بخش با متن‌های سنجیده‌شده (assets/awareness-data.js)
+function toolAwareness() {
+  const A = window.SARE_AWARENESS || {};
+  openModal("آگاهی‌نامه", `
+    <div class="conv-tabs">
+      <button class="conv-tab active" data-aw="fest">جشن‌های ماهانه</button>
+      <button class="conv-tab" data-aw="sasan">پایان ساسانیان</button>
+      <button class="conv-tab" data-aw="cities">نام شهرها</button>
+    </div>
+    <div id="aw-body" class="aw-body"></div>`);
+  const body = document.getElementById("aw-body");
+  const sources = (arr) => `<div class="aw-sources"><b>منبع‌ها</b><ul>${(arr || []).map((x) => `<li>${escapeHtml(x)}</li>`).join("")}</ul></div>`;
+  const p = (t, cls) => `<p class="aw-p ${cls || ""}">${escapeHtml(t)}</p>`;
+  const civilLabel = (c) => `${toFaDigits(c.jd)} ${MONTHS_FA[c.jm - 1]}`;
+
+  const views = {
+    fest() {
+      const f = A.fest || {};
+      const t = todayJalali();
+      const b = civilToBastani(t.jy, t.jm, t.jd);
+      const todayLine = b.gatha
+        ? `امروز در گاهشمار بستانی «روز گات ${toFaDigits(b.gatha)}» (روزهای پایانِ سال) است.`
+        : `امروز در گاهشمار بستانی ${toFaDigits(b.d)} ${MONTHS_FA[b.m - 1]} است (روزِ «${ZOROASTRIAN_DAY_NAMES[b.d - 1]}»).`;
+      const rows = MONTH_FESTIVALS.map((fe) => {
+        const nominal = fe.days.map((d) => `${toFaDigits(d)} ${MONTHS_FA[fe.m - 1]}`).join("، ");
+        const observed = fe.days.map((d) => civilLabel(bastaniToCivil(fe.m, d))).join("، ");
+        const same = nominal === observed;
+        return `<tr><td>${escapeHtml(fe.n)}</td><td>${nominal}</td><td class="${same ? "" : "aw-diff"}">${observed}</td></tr>`;
+      }).join("");
+      const chips = ZOROASTRIAN_DAY_NAMES.map((n, i) => `<span class="aw-chip"><i>${toFaDigits(i + 1)}</i>${escapeHtml(n)}</span>`).join("");
+      body.innerHTML = [
+        p(f.intro), `<div class="aw-today">${todayLine}</div>`, p(f.aban), p(f.legend, "aw-legend"), p(f.twoDates), p(f.dayName),
+        `<h4 class="aw-h">جشن‌های ماهانه و دو تاریخشان</h4>
+         <div class="aw-scroll"><table class="aw-table"><thead><tr><th>جشن</th><th>نام‌روز (روز و ماه هم‌نام)</th><th>برگزاریِ زرتشتیان در گاهشمار رسمی</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+        p(f.note, "aw-note"),
+        `<h4 class="aw-h">نام سی روزِ ماه</h4><div class="aw-chips">${chips}</div>`,
+        sources(f.sources),
+      ].join("");
+    },
+    sasan() {
+      const s = A.sasan || {};
+      const claims = (s.claims || []).map((c) => `
+        <div class="aw-claim">
+          <div class="aw-claim-head"><span class="aw-badge v-${c.v}">${escapeHtml(c.l)}</span><span class="aw-claim-text">«${escapeHtml(c.c)}»</span></div>
+          <div class="aw-claim-note">${escapeHtml(c.n)}</div>
+        </div>`).join("");
+      body.innerHTML = [p(s.intro), claims, sources(s.sources)].join("");
+    },
+    cities() {
+      const c = A.cities || {};
+      const rows = (c.verified || []).map((r) => `<tr><td>${escapeHtml(r.n)}</td><td>${escapeHtml(r.o)}</td><td>${escapeHtml(r.note)}</td></tr>`).join("");
+      body.innerHTML = [
+        p(c.intro),
+        `<div class="aw-scroll"><table class="aw-table"><thead><tr><th>امروز</th><th>شکل کهن</th><th>یادداشت</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+        `<h4 class="aw-h">نام‌هایی که نیاوردیم</h4>`, p(c.unverifiedNames, "aw-note"), p(c.unverifiedNote),
+        sources(c.sources),
+      ].join("");
+    },
+  };
+  const show = (id) => { (views[id] || views.fest)(); body.scrollTop = 0; };
+  document.querySelectorAll("#modal-body .conv-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("#modal-body .conv-tab").forEach((b) => b.classList.remove("active"));
+      tab.classList.add("active");
+      show(tab.dataset.aw);
+    });
+  });
+  show("fest");
+}
+
 const TOOLS = {
   "date-converter": { label: "ترادیسیِ روزشمار", run: toolDateConverter },
   "date-diff": { label: "فاصله‌ی دو روزشمار و دیره", run: toolDateDiff },
@@ -1235,6 +1359,7 @@ const TOOLS = {
   "share-today": { label: "هم‌رسانیِ امروز", run: toolShareToday },
   "event-search": { label: "جست‌وجوی رخداد", run: toolEventSearch },
   "word-finder": { label: "واژه‌یاب سره", run: toolWordFinder },
+  "awareness": { label: "آگاهی‌نامه", run: toolAwareness },
   "settings": { label: "تنظیمات", run: toolSettings },
 };
 

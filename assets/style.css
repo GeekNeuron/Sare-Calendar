@@ -762,3 +762,31 @@ html.font-lg { font-size: 18px; }
 .name-root { color: var(--muted); font-size: 0.74rem; margin-top: 2px; line-height: 1.7; }
 .name-verified { color: var(--teal); border-color: var(--teal); }
 @media (max-width: 640px) { .seg-extra { display: none; } }
+
+/* آگاهی‌نامه */
+.aw-body { max-height: 62vh; overflow-y: auto; padding-inline-end: 4px; }
+.aw-p { font-size: 0.86rem; line-height: 2; margin: 0 0 10px; }
+.aw-legend { color: var(--muted); border-inline-start: 3px solid var(--line); padding-inline-start: 10px; }
+.aw-note { font-size: 0.76rem; color: var(--muted); }
+.aw-h { margin: 14px 0 6px; font-size: 0.9rem; color: var(--teal-deep); }
+.aw-today { background: var(--ivory); border-radius: 8px; padding: 8px 12px; margin: 4px 0 10px; font-size: 0.84rem; }
+.aw-scroll { overflow-x: auto; }
+.aw-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.aw-table th, .aw-table td { border-bottom: 1px solid var(--line); padding: 6px 6px; text-align: right; vertical-align: top; }
+.aw-table th { color: var(--muted); font-weight: 600; }
+.aw-diff { color: var(--teal-deep); font-weight: 700; }
+.aw-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.aw-chip { background: var(--ivory); border-radius: 999px; padding: 2px 9px; font-size: 0.74rem; }
+.aw-chip i { font-style: normal; color: var(--muted); margin-inline-end: 4px; }
+.aw-claim { background: var(--ivory); border-radius: 10px; padding: 9px 12px; margin: 0 0 8px; }
+.aw-claim-head { display: flex; gap: 8px; align-items: flex-start; }
+.aw-claim-text { font-size: 0.84rem; line-height: 1.8; }
+.aw-claim-note { font-size: 0.78rem; color: var(--muted); margin-top: 4px; line-height: 1.9; }
+.aw-badge { flex: none; font-size: 0.68rem; padding: 1px 9px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+.aw-badge.v-ok { color: var(--teal-deep); border-color: var(--teal); }
+.aw-badge.v-part { color: #8a6a00; border-color: #c9a227; }
+.aw-badge.v-myth { color: #8a3b3b; border-color: #b85c5c; }
+.aw-badge.v-unk { color: var(--muted); }
+.aw-sources { margin-top: 12px; font-size: 0.72rem; color: var(--muted); }
+.aw-sources ul { margin: 4px 0 0; padding-inline-start: 18px; }
+.detail-bastani { display: block; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
